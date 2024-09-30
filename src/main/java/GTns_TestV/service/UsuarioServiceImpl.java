@@ -37,5 +37,18 @@ public class UsuarioServiceImpl implements UsuarioService {
         return TokenResponse.builder().token(token).build();
     }
 
+    @Override
+    public TokenResponse addUsuario(UsuarioDTO usuarioDTO) {
+        Usuario user = usuarioMapper.toEntity(usuarioDTO);
+        usuarioRepository.save(user);
 
+        String token = jwtService.getToken(user, user);
+        return TokenResponse.builder().token(token).build();
+    }
+
+    @Override
+    public Usuario getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (Usuario) authentication.getPrincipal();  // Asegúrate de que la clase Usuario implemente UserDetails
+    }
 }

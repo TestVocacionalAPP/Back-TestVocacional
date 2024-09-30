@@ -9,5 +9,7 @@ public interface UsuarioService {
 
     TokenResponse login(LoginRequest request);
 
+    TokenResponse addUsuario(UsuarioDTO usuarioDTO);
 
+    Usuario getAuthenticatedUser();
 }

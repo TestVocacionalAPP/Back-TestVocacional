@@ -27,5 +27,15 @@ public class UsuarioController {
         return ResponseEntity.ok(token); // Devuelve el token en la respuesta
     }
 
-
+    /**
+     * Método para registrar un nuevo usuario.
+     * @param usuarioDTO Objeto con los datos del nuevo usuario
+     * @return ResponseEntity con el token JWT generado
+     */
+    @PostMapping("/register")
+    public ResponseEntity<TokenResponse> register(@RequestBody UsuarioDTO usuarioDTO) {
+        // Llama al servicio de usuario para manejar el registro de un nuevo usuario
+        TokenResponse tokenResponse = usuarioService.addUsuario(usuarioDTO);
+        return ResponseEntity.ok(tokenResponse); // Devuelve el token en la respuesta
+    }
 }
