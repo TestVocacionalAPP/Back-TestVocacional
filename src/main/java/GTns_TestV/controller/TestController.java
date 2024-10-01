@@ -4,6 +4,7 @@ import GTns_TestV.infra.repository.PreguntaRepository;
 import GTns_TestV.infra.repository.RespuestaRepository;
 import GTns_TestV.infra.repository.TestRepository;
 import GTns_TestV.model.dto.RespuestaDTO;
+import GTns_TestV.model.dto.test.TestConPreguntasDTO;
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
 import GTns_TestV.model.entity.Pregunta;
@@ -13,6 +14,7 @@ import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Aptitud;
 import GTns_TestV.model.enums.Interes;
 import GTns_TestV.model.enums.TipoPregunta;
+import GTns_TestV.service.PreguntaService;
 import GTns_TestV.service.TestService;
 import GTns_TestV.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class TestController {
     private final TestRepository testRepository;  // Asegúrate de que esté inyectado correctamente
     private final PreguntaRepository preguntaRepository;
     private final RespuestaRepository respuestaRepository;
+    private final PreguntaService preguntaService;
 
     @PostMapping("/crear")
     public ResponseEntity<TestResponseDTO> crearTest(@RequestBody TestCreationDTO testCreationDTO) {
@@ -162,5 +165,9 @@ public class TestController {
 
         return ResponseEntity.ok("Respuestas guardadas correctamente");
     }
-
+    @GetMapping("/{testId}/preguntas")
+    public ResponseEntity<TestConPreguntasDTO> obtenerTestConPreguntas(@PathVariable Long testId) {
+        TestConPreguntasDTO testConPreguntas = testService.obtenerPreguntasPorTest(testId);
+        return ResponseEntity.ok(testConPreguntas);
+    }
 }

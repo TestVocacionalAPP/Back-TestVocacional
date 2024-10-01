@@ -9,8 +9,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/preguntas")
+@RequestMapping("/api/preguntas")
 @RequiredArgsConstructor
 public class PreguntaController {
+
+    private final PreguntaService preguntaService;
+
+    // Crear nueva pregunta
+    @PostMapping("/crear")
+    public ResponseEntity<Pregunta> crearPregunta(@RequestBody Pregunta pregunta) {
+        Pregunta nuevaPregunta = preguntaService.crearPregunta(pregunta);
+        return ResponseEntity.ok(nuevaPregunta);
+    }
+
 
 }
