@@ -1,7 +1,9 @@
 package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.PreguntaRepository;
+import GTns_TestV.infra.repository.TestRepository;
 import GTns_TestV.model.entity.Pregunta;
+import GTns_TestV.model.entity.Test;
 import GTns_TestV.service.PreguntaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,7 @@ import java.util.List;
 public class PreguntaServiceImpl implements PreguntaService {
 
     private final PreguntaRepository preguntaRepository;
-
+    private final TestRepository testRepository;
     @Override
     @Transactional
     public Pregunta crearPregunta(Pregunta pregunta) {
@@ -49,5 +51,13 @@ public class PreguntaServiceImpl implements PreguntaService {
     public void eliminarPregunta(Long id) {
         Pregunta pregunta = obtenerPreguntaPorId(id);
         preguntaRepository.delete(pregunta);
+    }
+
+    // Método para obtener todas las preguntas de un test específico
+    public List<Pregunta> obtenerPreguntasPorTest(Long testId) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new RuntimeException("Test no encontrado"));
+
+        return test.getPreguntas();  // Devuelve la lista de preguntas asociadas al test
     }
 }
