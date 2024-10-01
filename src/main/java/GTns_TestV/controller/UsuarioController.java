@@ -1,6 +1,7 @@
 package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.UsuarioDTO;
+import GTns_TestV.model.dto.UsuarioPerfilDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
@@ -55,5 +56,11 @@ public class UsuarioController {
         // Obtener el usuario autenticado y eliminar su cuenta
         usuarioService.eliminarCuenta();
         return ResponseEntity.ok("Cuenta eliminada exitosamente");
+    }
+
+    @PutMapping("/editar-perfil")
+    public ResponseEntity<Usuario> editarPerfil(@RequestBody UsuarioPerfilDTO usuarioPerfilDTO) {
+        Usuario usuarioActualizado = usuarioService.actualizarPerfil(usuarioPerfilDTO);
+        return ResponseEntity.ok(usuarioActualizado);
     }
 }
