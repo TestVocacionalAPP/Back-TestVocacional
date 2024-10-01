@@ -1,6 +1,7 @@
 package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.UsuarioRepository;
+import GTns_TestV.model.dto.UsuarioPerfilDTO;
 import GTns_TestV.model.dto.mapper.UsuarioMapper;
 import GTns_TestV.model.dto.UsuarioDTO;
 import GTns_TestV.model.entity.Usuario;
@@ -66,5 +67,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         // Eliminar el usuario de la base de datos
         usuarioRepository.deleteById(usuarioActual.getId());
+    }
+
+    @Override
+    public Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO) {
+        // Obtener el usuario autenticado
+        Usuario usuarioActual = getAuthenticatedUser();
+
+        // Actualizar los datos del perfil
+        usuarioActual.setNombre(usuarioPerfilDTO.getNombre());
+        usuarioActual.setApellido(usuarioPerfilDTO.getApellido());
+        usuarioActual.setTelefono(usuarioPerfilDTO.getTelefono());
+        usuarioActual.setCorreo(usuarioPerfilDTO.getCorreo());
+
+        // Guardar los cambios
+        return usuarioRepository.save(usuarioActual);
     }
 }
