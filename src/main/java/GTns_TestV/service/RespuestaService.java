@@ -6,5 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 public interface RespuestaService {
-    Map<String, Object> calcularFilaConMayorRespuestas();
+    Map<String, Object> calcularFilaConMayorRespuestas(Long idUsuario);
+
 }
