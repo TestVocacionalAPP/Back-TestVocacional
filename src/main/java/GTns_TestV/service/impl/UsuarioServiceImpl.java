@@ -4,6 +4,7 @@ import GTns_TestV.infra.repository.UsuarioRepository;
 import GTns_TestV.model.dto.mapper.UsuarioMapper;
 import GTns_TestV.model.dto.UsuarioDTO;
 import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.enums.Role;
 import GTns_TestV.security.JwtService;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
@@ -50,5 +51,20 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return (Usuario) authentication.getPrincipal();  // Asegúrate de que la clase Usuario implemente UserDetails
+    }
+
+    // Método para crear un usuario experto, solo accesible por admin
+    public Usuario crearExperto(UsuarioDTO usuarioDTO) {
+        Usuario experto = usuarioMapper.toEntity(usuarioDTO);
+        experto.setRole(Role.EXPERTO);  // Forzamos el rol a EXPERTO
+        return usuarioRepository.save(experto);
+    }
+    @Override
+    public void eliminarCuenta() {
+        // Obtener el usuario autenticado
+        Usuario usuarioActual = getAuthenticatedUser();
+
+        // Eliminar el usuario de la base de datos
+        usuarioRepository.deleteById(usuarioActual.getId());
     }
 }

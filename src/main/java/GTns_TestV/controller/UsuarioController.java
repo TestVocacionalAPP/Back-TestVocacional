@@ -1,11 +1,14 @@
 package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.UsuarioDTO;
+import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
 import GTns_TestV.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController // Marca esta clase como un controlador REST de Spring
@@ -37,5 +40,20 @@ public class UsuarioController {
         // Llama al servicio de usuario para manejar el registro de un nuevo usuario
         TokenResponse tokenResponse = usuarioService.addUsuario(usuarioDTO);
         return ResponseEntity.ok(tokenResponse); // Devuelve el token en la respuesta
+    }
+
+    //@PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/crear-experto")
+    public ResponseEntity<Usuario> crearExperto(@RequestBody UsuarioDTO expertoDTO) {
+        // Crear un experto en el sistema
+        Usuario experto = usuarioService.crearExperto(expertoDTO);
+        return new ResponseEntity<>(experto, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/eliminar")
+    public ResponseEntity<String> eliminarCuenta() {
+        // Obtener el usuario autenticado y eliminar su cuenta
+        usuarioService.eliminarCuenta();
+        return ResponseEntity.ok("Cuenta eliminada exitosamente");
     }
 }

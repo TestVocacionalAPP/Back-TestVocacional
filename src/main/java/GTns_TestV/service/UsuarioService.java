@@ -12,4 +12,8 @@ public interface UsuarioService {
     TokenResponse addUsuario(UsuarioDTO usuarioDTO);
 
     Usuario getAuthenticatedUser();
+
+    Usuario crearExperto(UsuarioDTO usuarioDTO);
+
+    void eliminarCuenta();
 }
