@@ -1,12 +1,17 @@
 package GTns_TestV.controller;
 
 import GTns_TestV.infra.repository.PreguntaRepository;
+import GTns_TestV.infra.repository.RespuestaRepository;
 import GTns_TestV.infra.repository.TestRepository;
+import GTns_TestV.model.dto.RespuestaDTO;
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
 import GTns_TestV.model.entity.Pregunta;
+import GTns_TestV.model.entity.Respuesta;
 import GTns_TestV.model.entity.Test;
 import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.enums.Aptitud;
+import GTns_TestV.model.enums.Interes;
 import GTns_TestV.model.enums.TipoPregunta;
 import GTns_TestV.service.TestService;
 import GTns_TestV.service.UsuarioService;
@@ -33,6 +38,7 @@ public class TestController {
     private final UsuarioService usuarioService;  // Inyectamos UsuarioService
     private final TestRepository testRepository;  // Asegúrate de que esté inyectado correctamente
     private final PreguntaRepository preguntaRepository;
+    private final RespuestaRepository respuestaRepository;
 
     @PostMapping("/crear")
     public ResponseEntity<TestResponseDTO> crearTest(@RequestBody TestCreationDTO testCreationDTO) {
@@ -113,8 +119,48 @@ public class TestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error procesando el archivo");
         }
     }
+    @PostMapping("/responder")
+    public ResponseEntity<String> responderCuestionario(@RequestBody List<RespuestaDTO> respuestasDTO) {
+        Usuario usuario = usuarioService.getAuthenticatedUser();
 
+        List<Respuesta> respuestas = new ArrayList<>();
 
+        for (RespuestaDTO respuestaDTO : respuestasDTO) {
+            Pregunta pregunta = preguntaRepository.findById(respuestaDTO.getIdPregunta())
+                    .orElseThrow(() -> new RuntimeException("Pregunta no encontrada. ID: " + respuestaDTO.getIdPregunta()));
 
+            Respuesta respuesta = new Respuesta();
+            respuesta.setPregunta(pregunta);
+            respuesta.setUsuario(usuario);
+            respuesta.setValor(respuestaDTO.getValor());
+
+            // Asigna el tipo de pregunta (INTERES o APTITUD)
+            respuesta.setTipoPregunta(pregunta.getTipoPregunta());
+
+            // Verificar el tipo de pregunta y asignar la categoría adecuada
+            if (pregunta.getTipoPregunta().equals(TipoPregunta.INTERES)) {
+                try {
+                    Interes interesEnum = Interes.valueOf(pregunta.getCategoria().toUpperCase());
+                    respuesta.setInteres(interesEnum);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Categoría de interés inválida: " + pregunta.getCategoria());
+                }
+            } else if (pregunta.getTipoPregunta().equals(TipoPregunta.APTITUD)) {
+                try {
+                    Aptitud aptitudEnum = Aptitud.valueOf(pregunta.getCategoria().toUpperCase());
+                    respuesta.setAptitud(aptitudEnum);
+                } catch (IllegalArgumentException e) {
+                    throw new RuntimeException("Categoría de aptitud inválida: " + pregunta.getCategoria());
+                }
+            }
+
+            respuestas.add(respuesta);
+        }
+
+        // Guarda todas las respuestas en la base de datos
+        respuestaRepository.saveAll(respuestas);
+
+        return ResponseEntity.ok("Respuestas guardadas correctamente");
+    }
 
 }
