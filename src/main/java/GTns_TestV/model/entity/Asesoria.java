@@ -32,4 +32,6 @@ public class Asesoria {
     private LocalDateTime fechaSolicitada;
     @Column(nullable = true)
     private LocalDateTime fechaConfirmada;
+
+    private String estado;
 }
