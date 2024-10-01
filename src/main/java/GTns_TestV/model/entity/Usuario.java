@@ -1,6 +1,7 @@
 package GTns_TestV.model.entity;
 
 import GTns_TestV.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import jakarta.persistence.*;
@@ -49,12 +50,13 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
-    // Relación OneToMany con Respuesta (con eliminación en cascada)
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Añade esto para evitar el problema de la serialización perezosa.
     private List<Respuesta> respuestas;
 
-    // Relación OneToMany con Test (con eliminación en cascada)
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Evita que Jackson serialice la colección de tests
     private List<Test> tests;
 
     @Override
