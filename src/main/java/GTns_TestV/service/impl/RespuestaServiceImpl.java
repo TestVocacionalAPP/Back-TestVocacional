@@ -18,58 +18,55 @@ public class RespuestaServiceImpl implements RespuestaService {
     private RespuestaRepository respuestaRepository;
 
     @Override
-    public Map<String, Object> calcularFilaConMayorRespuestas() {
-        List<Respuesta> respuestas = respuestaRepository.findAll();
+    public Map<String, Object> calcularFilaConMayorRespuestas(Long idUsuario) {
+        // Filtrar las respuestas del usuario actual
+        List<Respuesta> respuestas = respuestaRepository.findByUsuarioId(idUsuario);
 
-        // Mapas para almacenar la suma de respuestas por categoría para intereses y aptitudes
-        Map<Interes, Integer> sumaPorInteres = new HashMap<>();
-        Map<Aptitud, Integer> sumaPorAptitud = new HashMap<>();
+        // Inicializamos las sumas de cada categoría en CHASIDE para INTERES y APTITUD
+        Map<String, Integer> sumaInteres = new HashMap<>();
+        Map<String, Integer> sumaAptitud = new HashMap<>();
 
-        // Inicializar los mapas de categorías con valor 0 para intereses y aptitudes
-        for (Interes interes : Interes.values()) {
-            sumaPorInteres.put(interes, 0);
-        }
-        for (Aptitud aptitud : Aptitud.values()) {
-            sumaPorAptitud.put(aptitud, 0);
-        }
+        // Inicializar las sumas en 0 para cada letra de CHASIDE
+        Arrays.asList("C", "H", "A", "S", "I", "D", "E").forEach(letra -> {
+            sumaInteres.put(letra, 0);
+            sumaAptitud.put(letra, 0);
+        });
 
-        // Iterar sobre todas las respuestas y sumar el valor según el tipo de pregunta
+        // Iterar sobre todas las respuestas y sumar el valor de acuerdo a la categoría de la pregunta
         for (Respuesta respuesta : respuestas) {
             Integer valor = respuesta.getValor();
+            Integer numeroPregunta = respuesta.getPregunta().getIdPregunta().intValue(); // Número de la pregunta
 
             if (respuesta.getTipoPregunta() == TipoPregunta.INTERES) {
-                Interes interes = respuesta.getInteres();  // Obtenemos la categoría de interés
-                sumaPorInteres.put(interes, sumaPorInteres.get(interes) + valor);
+                // Sumamos las respuestas en función de la letra de CHASIDE correspondiente para INTERES
+                for (Interes interes : Interes.values()) {
+                    if (interes.getPreguntas().contains(numeroPregunta)) {
+                        sumaInteres.put(interes.name(), sumaInteres.get(interes.name()) + valor);
+                    }
+                }
             } else if (respuesta.getTipoPregunta() == TipoPregunta.APTITUD) {
-                Aptitud aptitud = respuesta.getAptitud();  // Obtenemos la categoría de aptitud
-                sumaPorAptitud.put(aptitud, sumaPorAptitud.get(aptitud) + valor);
+                // Sumamos las respuestas en función de la letra de CHASIDE correspondiente para APTITUD
+                for (Aptitud aptitud : Aptitud.values()) {
+                    if (aptitud.getPreguntas().contains(numeroPregunta)) {
+                        sumaAptitud.put(aptitud.name(), sumaAptitud.get(aptitud.name()) + valor);
+                    }
+                }
             }
         }
 
-        // Encontrar la categoría con la mayor cantidad de respuestas afirmativas para intereses
-        Map.Entry<Interes, Integer> interesMaximo = sumaPorInteres.entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .orElseThrow(() -> new RuntimeException("No hay respuestas de interés disponibles"));
+        // Obtener la letra con mayor valor en INTERES y APTITUD
+        String maxInteres = Collections.max(sumaInteres.entrySet(), Map.Entry.comparingByValue()).getKey();
+        String maxAptitud = Collections.max(sumaAptitud.entrySet(), Map.Entry.comparingByValue()).getKey();
 
-        // Encontrar la categoría con la mayor cantidad de respuestas afirmativas para aptitudes
-        Map.Entry<Aptitud, Integer> aptitudMaxima = sumaPorAptitud.entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .orElseThrow(() -> new RuntimeException("No hay respuestas de aptitud disponibles"));
+        // Determinar cuál tiene el mayor valor general
+        String tipoMayorCategoria = sumaInteres.get(maxInteres) >= sumaAptitud.get(maxAptitud) ? "Interes" : "Aptitud";
 
-        // Comparar los máximos de ambos tipos y determinar cuál tiene mayor valor
-        String tipoMayorCategoria;
-        if (interesMaximo.getValue() >= aptitudMaxima.getValue()) {
-            tipoMayorCategoria = "Interes";
-        } else {
-            tipoMayorCategoria = "Aptitud";
-        }
-
-        // Retornar la categoría con el mayor valor (puedes ajustar esto para retornar lo que necesites)
+        // Devolvemos las sumas y la categoría mayor
         Map<String, Object> resultado = new HashMap<>();
-        resultado.put("CategoriaMayorInteres", interesMaximo.getKey());
-        resultado.put("CategoriaMayorAptitud", aptitudMaxima.getKey());
+        resultado.put("Interes", sumaInteres);  // Suma para cada letra de CHASIDE en INTERES
+        resultado.put("Aptitud", sumaAptitud);  // Suma para cada letra de CHASIDE en APTITUD
+        resultado.put("CategoriaMayorInteres", maxInteres);
+        resultado.put("CategoriaMayorAptitud", maxAptitud);
         resultado.put("TipoMayorCategoria", tipoMayorCategoria);
 
         return resultado;
