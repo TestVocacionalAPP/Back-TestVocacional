@@ -44,4 +44,77 @@ public class TestController {
 
         return ResponseEntity.ok(nuevoTest);
     }
+
+    @PostMapping("/upload-excel")
+    public ResponseEntity<String> uploadExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("idTest") Long idTest) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("El archivo está vacío");
+        }
+
+        try {
+            // Verificar si el test existe
+            Test test = testRepository.findById(idTest)
+                    .orElseThrow(() -> new RuntimeException("Test no encontrado"));
+
+            // Procesar el archivo Excel
+            Workbook workbook = new XSSFWorkbook(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0); // Obtener la primera hoja del archivo Excel
+
+            List<Pregunta> preguntas = new ArrayList<>();
+
+            // Iterar sobre las filas del archivo Excel
+            for (Row row : sheet) {
+                // Obtener la primera celda que contiene la pregunta
+                Cell preguntaCell = row.getCell(0);  // Primera columna (A)
+                // Obtener la segunda celda que contiene la categoría (C, H, A, etc.)
+                Cell categoriaCell = row.getCell(1);  // Segunda columna (B)
+                // Obtener la tercera celda que contiene el tipo de pregunta (INTERES o APTITUD)
+                Cell tipoPreguntaCell = row.getCell(2);  // Tercera columna (C)
+
+                if (preguntaCell != null && categoriaCell != null && tipoPreguntaCell != null) {
+                    String preguntaTexto = preguntaCell.getStringCellValue().trim();
+                    String categoria = categoriaCell.getStringCellValue().trim().toUpperCase();  // C, H, A, S, etc.
+                    String tipoPreguntaStr = tipoPreguntaCell.getStringCellValue().trim().toUpperCase();
+
+                    try {
+                        // Verificar si el tipo de pregunta es válido (INTERES o APTITUD)
+                        TipoPregunta tipo = TipoPregunta.valueOf(tipoPreguntaStr);
+
+                        // Verificar que la categoría es válida
+                        if (!List.of("C", "H", "A", "S", "I", "D", "E").contains(categoria)) {
+                            return ResponseEntity.badRequest().body("Categoría inválida en la fila: " + (row.getRowNum() + 1) + ". Valor: " + categoria);
+                        }
+
+                        // Crear la entidad Pregunta
+                        Pregunta pregunta = new Pregunta();
+                        pregunta.setEnunciado(preguntaTexto);
+                        pregunta.setTest(test);
+                        pregunta.setTipoPregunta(tipo); // Asignar el tipo de pregunta
+
+                        // Asignar la categoría
+                        pregunta.setCategoria(categoria);
+
+                        preguntas.add(pregunta); // Agregar la pregunta a la lista
+
+                    } catch (IllegalArgumentException e) {
+                        // Si el tipo de pregunta no es válido, lo reportamos
+                        return ResponseEntity.badRequest().body("Tipo de pregunta inválido en la fila: " + (row.getRowNum() + 1) + ". Valor: " + tipoPreguntaStr);
+                    }
+                }
+            }
+
+            // Guardar todas las preguntas en la base de datos
+            preguntaRepository.saveAll(preguntas);
+
+            workbook.close();
+            return ResponseEntity.ok("Preguntas subidas correctamente");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error procesando el archivo");
+        }
+    }
+
+
+
+
 }
