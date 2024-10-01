@@ -2,7 +2,8 @@ package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.AsesoriaRepository;
 import GTns_TestV.infra.repository.UsuarioRepository;
-import GTns_TestV.model.dto.AsesoriaDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
 import GTns_TestV.model.entity.Asesoria;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
@@ -10,7 +11,8 @@ import GTns_TestV.service.AsesoriaService;
 import GTns_TestV.model.dto.mapper.AsesoriaMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,16 +23,16 @@ public class AsesoriaServiceImpl implements AsesoriaService {
     private final AsesoriaMapper asesoriaMapper;
 
     @Override
-    public AsesoriaDTO solicitarAsesoria(Long usuarioId, AsesoriaDTO asesoriaDTO) {
+    public AsesoriaResponseDTO solicitarAsesoria(Long usuarioId, AsesoriaCreateDTO asesoriaCreateDTO) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         // Asegurarse de que el experto no sea null
-        if (asesoriaDTO.getExperto() == null || asesoriaDTO.getExperto().getId() == null) {
+        if (asesoriaCreateDTO.getExpertoId() == null) {
             throw new RuntimeException("El experto no ha sido proporcionado.");
         }
 
-        Usuario experto = usuarioRepository.findById(asesoriaDTO.getExperto().getId())
+        Usuario experto = usuarioRepository.findById(asesoriaCreateDTO.getExpertoId())
                 .orElseThrow(() -> new RuntimeException("Experto no encontrado"));
 
         // Validar que el usuario tenga el rol de "EXPERTO"
@@ -41,13 +43,23 @@ public class AsesoriaServiceImpl implements AsesoriaService {
         Asesoria asesoria = new Asesoria();
         asesoria.setUsuario(usuario);
         asesoria.setExperto(experto);
-        asesoria.setAsunto(asesoriaDTO.getAsunto());
-        asesoria.setFechaSolicitada(asesoriaDTO.getFechaSolicitada());
+        asesoria.setAsunto(asesoriaCreateDTO.getAsunto());
+        asesoria.setFechaSolicitada(asesoriaCreateDTO.getFechaSolicitada());
 
         Asesoria savedAsesoria = asesoriaRepository.save(asesoria);
 
-        return asesoriaMapper.toDTO(savedAsesoria);
+        return asesoriaMapper.toResponseDTO(savedAsesoria);
     }
 
+    @Override
+    public List<AsesoriaResponseDTO> listarSolicitudesPorExperto(Long expertoId) {
+        // Obtener todas las asesorías donde el experto es el usuario autenticado
+        List<Asesoria> solicitudes = asesoriaRepository.findByExpertoId(expertoId);
+
+        // Mapear las entidades Asesoria a DTOs
+        return solicitudes.stream()
+                .map(asesoriaMapper::toResponseDTO)
+                .toList();
+    }
 
 }

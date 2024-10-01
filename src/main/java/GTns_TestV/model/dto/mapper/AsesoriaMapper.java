@@ -1,39 +1,28 @@
 package GTns_TestV.model.dto.mapper;
 
-import GTns_TestV.model.dto.AsesoriaDTO;
-import GTns_TestV.model.dto.UsuarioDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
 import GTns_TestV.model.entity.Asesoria;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AsesoriaMapper {
 
-    public AsesoriaDTO toDTO(Asesoria asesoria) {
-        return new AsesoriaDTO(
+    public AsesoriaResponseDTO toResponseDTO(Asesoria asesoria) {
+        return new AsesoriaResponseDTO(
                 asesoria.getId(),
-                UsuarioDTO.builder()
-                        .id(asesoria.getUsuario().getId())
-                        .nombre(asesoria.getUsuario().getNombre())
-                        .apellido(asesoria.getUsuario().getApellido())
-                        .correo(asesoria.getUsuario().getCorreo())
-                        .build(),
-                UsuarioDTO.builder()
-                        .id(asesoria.getExperto().getId())
-                        .nombre(asesoria.getExperto().getNombre())
-                        .apellido(asesoria.getExperto().getApellido())
-                        .correo(asesoria.getExperto().getCorreo())
-                        .build(),
                 asesoria.getAsunto(),
                 asesoria.getFechaSolicitada(),
-                asesoria.getFechaConfirmada()
+                asesoria.getFechaConfirmada(),
+                asesoria.getUsuario().getNombre(),
+                asesoria.getExperto().getNombre()
         );
     }
 
-    public Asesoria toEntity(AsesoriaDTO dto) {
+    public Asesoria toEntity(AsesoriaCreateDTO createDTO) {
         Asesoria asesoria = new Asesoria();
-        asesoria.setAsunto(dto.getAsunto());
-        asesoria.setFechaSolicitada(dto.getFechaSolicitada());
-        asesoria.setFechaConfirmada(dto.getFechaConfirmada());
+        asesoria.setAsunto(createDTO.getAsunto());
+        asesoria.setFechaSolicitada(createDTO.getFechaSolicitada());
         return asesoria;
     }
 }
