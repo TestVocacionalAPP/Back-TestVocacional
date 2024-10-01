@@ -2,6 +2,7 @@ package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
 import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaUpdateDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.service.AsesoriaService;
@@ -49,5 +50,21 @@ public class AsesoriaController {
 
         // Retornar la lista de solicitudes
         return ResponseEntity.ok(solicitudes);
+    }
+
+    @PutMapping("/experto/actualizar-estado")
+    public ResponseEntity<AsesoriaResponseDTO> actualizarEstadoAsesoria(@RequestBody AsesoriaUpdateDTO asesoriaUpdateDTO) {
+        // Obtener el usuario autenticado (experto)
+        Usuario expertoActual = usuarioService.getAuthenticatedUser();
+
+        // Verificar que el usuario sea un experto
+        if (!expertoActual.getRole().equals(Role.EXPERTO)) {
+            return ResponseEntity.status(403).build();  // Retornar 403 Forbidden si no es experto
+        }
+
+        // Actualizar el estado de la asesoría
+        AsesoriaResponseDTO respuesta = asesoriaService.actualizarEstadoAsesoria(expertoActual.getId(), asesoriaUpdateDTO);
+
+        return ResponseEntity.ok(respuesta);
     }
 }

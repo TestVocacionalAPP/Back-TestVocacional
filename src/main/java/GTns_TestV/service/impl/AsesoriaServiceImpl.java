@@ -4,11 +4,13 @@ import GTns_TestV.infra.repository.AsesoriaRepository;
 import GTns_TestV.infra.repository.UsuarioRepository;
 import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
 import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
+import GTns_TestV.model.dto.asesoria.AsesoriaUpdateDTO;
 import GTns_TestV.model.entity.Asesoria;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.service.AsesoriaService;
 import GTns_TestV.model.dto.mapper.AsesoriaMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,30 @@ public class AsesoriaServiceImpl implements AsesoriaService {
         return solicitudes.stream()
                 .map(asesoriaMapper::toResponseDTO)
                 .toList();
+    }
+    @Override
+    @Transactional
+    public AsesoriaResponseDTO actualizarEstadoAsesoria(Long expertoId, AsesoriaUpdateDTO asesoriaUpdateDTO) {
+        Asesoria asesoria = asesoriaRepository.findById(asesoriaUpdateDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Asesoría no encontrada"));
+
+        // Verificar que el experto asociado a la asesoría sea el que está autenticado
+        if (!asesoria.getExperto().getId().equals(expertoId)) {
+            throw new RuntimeException("No autorizado para actualizar esta asesoría.");
+        }
+
+        // Actualizar el estado de la asesoría
+        if ("aceptada".equalsIgnoreCase(asesoriaUpdateDTO.getEstado())) {
+            asesoria.setFechaConfirmada(asesoriaUpdateDTO.getFechaConfirmada());
+            asesoria.setEstado("aceptada");
+        } else if ("rechazada".equalsIgnoreCase(asesoriaUpdateDTO.getEstado())) {
+            asesoria.setEstado("rechazada");
+        } else {
+            throw new RuntimeException("Estado inválido. Debe ser 'aceptada' o 'rechazada'.");
+        }
+
+        Asesoria asesoriaActualizada = asesoriaRepository.save(asesoria);
+        return asesoriaMapper.toResponseDTO(asesoriaActualizada);  // Usar toResponseDTO
     }
 
 }
