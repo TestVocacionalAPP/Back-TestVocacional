@@ -6,6 +6,7 @@ import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
 import GTns_TestV.model.dto.test.TestUpdateDTO;
 import GTns_TestV.model.entity.Pregunta;
+import GTns_TestV.model.entity.Test;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public interface TestService {
 
     List<TestResponseDTO> obtenerTodosLosTests();
 
-    TestResponseDTO obtenerTestPorId(Long id);
+    Test obtenerTestPorId(Long id);
 
     void cargarPreguntasDesdeCSV(MultipartFile file, Long idTest, Long idUsuario);
 
@@ -27,4 +28,5 @@ public interface TestService {
     TestResponseDTO actualizarTest(Long idTest, TestUpdateDTO testUpdateDTO);
 
     TestConPreguntasDTO obtenerPreguntasPorTest(Long testId);
+
 }

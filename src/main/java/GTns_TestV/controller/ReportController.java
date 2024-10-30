@@ -2,14 +2,13 @@ package GTns_TestV.controller;
 
 import GTns_TestV.service.ReportService;
 import GTns_TestV.service.RespuestaService;
-import GTns_TestV.model.entity.Usuario;
-import GTns_TestV.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,15 +22,11 @@ public class ReportController {
 
     private final ReportService reportService;
     private final RespuestaService respuestaService;
-    private final UsuarioService usuarioService; // Para obtener el usuario actual
 
     @GetMapping("/test/pdf")
-    public ResponseEntity<InputStreamResource> generarReportePDF() {
-        // Obtener el usuario autenticado
-        Usuario usuarioActual = usuarioService.getAuthenticatedUser();
-
-        // Calcular los resultados del test para ese usuario y transformar a Map<String, Map<String, Integer>>
-        Map<String, Map<String, Integer>> resultadosTest = (Map<String, Map<String, Integer>>) (Map) respuestaService.calcularFilaConMayorRespuestas(usuarioActual.getId());
+    public ResponseEntity<InputStreamResource> generarReportePDF(@RequestParam Long historialTestId) {
+        // Calcular los resultados del test usando el historialTestId
+        Map<String, Object> resultadosTest = respuestaService.calcularFilaConMayorRespuestas(historialTestId);
 
         // Generar el PDF
         ByteArrayInputStream pdfStream = reportService.generarReportePDF(resultadosTest);

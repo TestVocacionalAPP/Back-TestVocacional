@@ -1,5 +1,6 @@
 package GTns_TestV.controller;
 
+import GTns_TestV.infra.repository.HistorialTestRepository;
 import GTns_TestV.infra.repository.PreguntaRepository;
 import GTns_TestV.infra.repository.RespuestaRepository;
 import GTns_TestV.infra.repository.TestRepository;
@@ -7,10 +8,7 @@ import GTns_TestV.model.dto.RespuestaDTO;
 import GTns_TestV.model.dto.test.TestConPreguntasDTO;
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
-import GTns_TestV.model.entity.Pregunta;
-import GTns_TestV.model.entity.Respuesta;
-import GTns_TestV.model.entity.Test;
-import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.entity.*;
 import GTns_TestV.model.enums.Aptitud;
 import GTns_TestV.model.enums.Interes;
 import GTns_TestV.model.enums.TipoPregunta;
@@ -28,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +36,12 @@ import java.util.List;
 public class TestController {
 
     private final TestService testService;
-    private final UsuarioService usuarioService;  // Inyectamos UsuarioService
-    private final TestRepository testRepository;  // Asegúrate de que esté inyectado correctamente
+    private final UsuarioService usuarioService;
+    private final TestRepository testRepository;
     private final PreguntaRepository preguntaRepository;
     private final RespuestaRepository respuestaRepository;
     private final PreguntaService preguntaService;
+    private final HistorialTestRepository historialTestRepository;
 
     @PostMapping("/crear")
     public ResponseEntity<TestResponseDTO> crearTest(@RequestBody TestCreationDTO testCreationDTO) {
@@ -122,9 +122,21 @@ public class TestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error procesando el archivo");
         }
     }
-    @PostMapping("/responder")
-    public ResponseEntity<String> responderCuestionario(@RequestBody List<RespuestaDTO> respuestasDTO) {
+    /*@PostMapping("/responder")
+    public ResponseEntity<String> responderCuestionario(@RequestBody List<RespuestaDTO> respuestasDTO, @RequestParam Long idTest) {
         Usuario usuario = usuarioService.getAuthenticatedUser();
+
+        // Obtener el test correspondiente
+        Test test = testRepository.findById(idTest)
+                .orElseThrow(() -> new RuntimeException("Test no encontrado con ID: " + idTest));
+
+        // Crear y guardar un nuevo historial
+        HistorialTest historialTest = new HistorialTest();
+        historialTest.setUsuario(usuario);
+        historialTest.setTest(test);
+        historialTest.setFecha(LocalDateTime.now());
+
+        historialTestRepository.save(historialTest); // Guarda el historial
 
         List<Respuesta> respuestas = new ArrayList<>();
 
@@ -135,26 +147,32 @@ public class TestController {
             Respuesta respuesta = new Respuesta();
             respuesta.setPregunta(pregunta);
             respuesta.setUsuario(usuario);
+            respuesta.setTest(test); // Asigna el test relacionado a la respuesta
             respuesta.setValor(respuestaDTO.getValor());
+            respuesta.setHistorialTest(historialTest); // Asigna el historial a la respuesta
 
             // Asigna el tipo de pregunta (INTERES o APTITUD)
-            respuesta.setTipoPregunta(pregunta.getTipoPregunta());
+            if (pregunta.getTipoPregunta() != null) {
+                respuesta.setTipoPregunta(pregunta.getTipoPregunta());
 
-            // Verificar el tipo de pregunta y asignar la categoría adecuada
-            if (pregunta.getTipoPregunta().equals(TipoPregunta.INTERES)) {
-                try {
-                    Interes interesEnum = Interes.valueOf(pregunta.getCategoria().toUpperCase());
-                    respuesta.setInteres(interesEnum);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("Categoría de interés inválida: " + pregunta.getCategoria());
+                // Asignar la categoría adecuada
+                if (pregunta.getTipoPregunta().equals(TipoPregunta.INTERES)) {
+                    try {
+                        Interes interesEnum = Interes.valueOf(pregunta.getCategoria().toUpperCase());
+                        respuesta.setInteres(interesEnum);
+                    } catch (IllegalArgumentException e) {
+                        throw new RuntimeException("Categoría de interés inválida: " + pregunta.getCategoria());
+                    }
+                } else if (pregunta.getTipoPregunta().equals(TipoPregunta.APTITUD)) {
+                    try {
+                        Aptitud aptitudEnum = Aptitud.valueOf(pregunta.getCategoria().toUpperCase());
+                        respuesta.setAptitud(aptitudEnum);
+                    } catch (IllegalArgumentException e) {
+                        throw new RuntimeException("Categoría de aptitud inválida: " + pregunta.getCategoria());
+                    }
                 }
-            } else if (pregunta.getTipoPregunta().equals(TipoPregunta.APTITUD)) {
-                try {
-                    Aptitud aptitudEnum = Aptitud.valueOf(pregunta.getCategoria().toUpperCase());
-                    respuesta.setAptitud(aptitudEnum);
-                } catch (IllegalArgumentException e) {
-                    throw new RuntimeException("Categoría de aptitud inválida: " + pregunta.getCategoria());
-                }
+            } else {
+                throw new RuntimeException("Tipo de pregunta nulo para la pregunta con ID: " + pregunta.getIdPregunta());
             }
 
             respuestas.add(respuesta);
@@ -165,6 +183,10 @@ public class TestController {
 
         return ResponseEntity.ok("Respuestas guardadas correctamente");
     }
+
+*/
+
+
     @GetMapping("/{testId}/preguntas")
     public ResponseEntity<TestConPreguntasDTO> obtenerTestConPreguntas(@PathVariable Long testId) {
         TestConPreguntasDTO testConPreguntas = testService.obtenerPreguntasPorTest(testId);

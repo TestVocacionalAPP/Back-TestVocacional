@@ -9,21 +9,22 @@ import org.springframework.stereotype.Component;
 public class RecursoMapper {
 
     public Recurso toEntity(RecursoCreateDTO recursoCreateDTO) {
-        return new Recurso(
-                null,  // El ID será generado automáticamente
-                recursoCreateDTO.getTitulo(),
-                recursoCreateDTO.getDescripcion(),
-                recursoCreateDTO.getTipoRecurso(),
-                recursoCreateDTO.getUrlRecurso()
-        );
+        return Recurso.builder()
+                .titulo(recursoCreateDTO.getTitulo())
+                .descripcion(recursoCreateDTO.getDescripcion())
+                .tipoRecurso(recursoCreateDTO.getTipoRecurso())
+                .urlRecurso(recursoCreateDTO.getUrlRecurso())
+                .build();
     }
 
     public RecursoResponseDTO toResponseDTO(Recurso recurso) {
-        return new RecursoResponseDTO(
-                recurso.getId(),
-                recurso.getTitulo(),
-                recurso.getDescripcion(),
-                recurso.getTipoRecurso()
-        );
+        return RecursoResponseDTO.builder()
+                .id(recurso.getId())
+                .titulo(recurso.getTitulo())
+                .descripcion(recurso.getDescripcion())
+                .tipoRecurso(recurso.getTipoRecurso())
+                .urlRecurso(recurso.getUrlRecurso())
+                .build();
     }
-}
+    }
+

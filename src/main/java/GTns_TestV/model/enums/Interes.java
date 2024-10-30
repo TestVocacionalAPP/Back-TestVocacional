@@ -1,6 +1,7 @@
 package GTns_TestV.model.enums;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public enum Interes {
     C(Arrays.asList(1, 12, 20, 53, 64, 71, 78, 85, 91, 98)),
@@ -19,5 +20,14 @@ public enum Interes {
 
     public List<Integer> getPreguntas() {
         return preguntas;
+    }
+
+    public static Interes fromPregunta(int pregunta) {
+        for (Interes interes : Interes.values()) {
+            if (interes.getPreguntas().contains(pregunta)) {
+                return interes;
+            }
+        }
+        throw new IllegalArgumentException("No se encontró Interés para la pregunta: " + pregunta);
     }
 }

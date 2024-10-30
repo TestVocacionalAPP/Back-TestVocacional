@@ -20,7 +20,7 @@ import java.util.Map;
 public class ReportServiceImpl implements ReportService {
 
     @Override
-    public ByteArrayInputStream generarReportePDF(Map<String, Map<String, Integer>> resultadoTest) {
+    public ByteArrayInputStream generarReportePDF(Map<String, Object> resultadoTest) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(out))) {
@@ -35,12 +35,9 @@ public class ReportServiceImpl implements ReportService {
             table.addHeaderCell("Categoría");
             table.addHeaderCell("Suma");
 
-            // Definir el orden de las categorías CHASIDE
-            List<String> chasideOrder = Arrays.asList("C", "H", "A", "S", "I", "D", "E");
-
-            // Añadir datos de Intereses en el orden CHASIDE
-            Map<String, Integer> interes = resultadoTest.get("Interes");
-            for (String categoria : chasideOrder) {
+            // Añadir datos de Intereses
+            Map<String, Integer> interes = (Map<String, Integer>) resultadoTest.get("Interes");
+            for (String categoria : Arrays.asList("C", "H", "A", "S", "I", "D", "E")) {
                 if (interes.containsKey(categoria)) {
                     table.addCell("Interes");
                     table.addCell(categoria);
@@ -48,9 +45,9 @@ public class ReportServiceImpl implements ReportService {
                 }
             }
 
-            // Añadir datos de Aptitudes en el orden CHASIDE
-            Map<String, Integer> aptitud = resultadoTest.get("Aptitud");
-            for (String categoria : chasideOrder) {
+            // Añadir datos de Aptitudes
+            Map<String, Integer> aptitud = (Map<String, Integer>) resultadoTest.get("Aptitud");
+            for (String categoria : Arrays.asList("C", "H", "A", "S", "I", "D", "E")) {
                 if (aptitud.containsKey(categoria)) {
                     table.addCell("Aptitud");
                     table.addCell(categoria);

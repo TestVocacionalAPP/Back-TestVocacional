@@ -30,9 +30,16 @@ public class RecursoServiceImpl implements RecursoService {
     public List<RecursoResponseDTO> listarRecursos() {
         List<Recurso> recursos = recursoRepository.findAll();
         return recursos.stream()
-                .map(recurso -> new RecursoResponseDTO(recurso.getId(), recurso.getTitulo(), recurso.getDescripcion(), recurso.getUrlRecurso()))
+                .map(recurso -> new RecursoResponseDTO(
+                        recurso.getId(),
+                        recurso.getTitulo(),
+                        recurso.getDescripcion(),
+                        recurso.getTipoRecurso(),
+                        recurso.getUrlRecurso()
+                ))
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public List<RecursoResponseDTO> buscarRecursos(String titulo, String descripcion) {
@@ -49,7 +56,7 @@ public class RecursoServiceImpl implements RecursoService {
         }
 
         return recursos.stream()
-                .map(recurso -> new RecursoResponseDTO(recurso.getId(), recurso.getTitulo(), recurso.getDescripcion(), recurso.getUrlRecurso()))
+                .map(recurso -> new RecursoResponseDTO(recurso.getId(), recurso.getTitulo(), recurso.getDescripcion(), recurso.getTipoRecurso(),recurso.getUrlRecurso() ))
                 .collect(Collectors.toList());
     }
 }

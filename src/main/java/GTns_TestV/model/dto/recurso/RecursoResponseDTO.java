@@ -1,5 +1,7 @@
 package GTns_TestV.model.dto.recurso;
 
+import GTns_TestV.model.enums.TipoRecurso;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,5 +15,9 @@ public class RecursoResponseDTO {
     private Long id;
     private String titulo;
     private String descripcion;
-    private String tipoRecurso;
+
+    @NotNull(message = "El campo tipoRecurso no puede ser nulo")
+    private TipoRecurso tipoRecurso;
+
+    private String urlRecurso;
 }

@@ -43,4 +43,13 @@ public class Respuesta {
     @JoinColumn(name = "id_pregunta", nullable = false)
     private Pregunta pregunta;
 
+    // Relación ManyToOne con Test (al que pertenece la respuesta)
+    @ManyToOne
+    @JoinColumn(name = "id_test", nullable = false)
+    private Test test;
+
+    @ManyToOne
+    @JoinColumn(name = "historial_test_id", nullable = false)
+    private HistorialTest historialTest; // Asegúrate de que esto sea correcto
+
 }

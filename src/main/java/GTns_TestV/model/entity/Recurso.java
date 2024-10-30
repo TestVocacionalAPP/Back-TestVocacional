@@ -1,26 +1,36 @@
 package GTns_TestV.model.entity;
 
+import GTns_TestV.model.enums.TipoRecurso;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "recursos")
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Recurso {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 150)
     private String titulo;
 
+    @Column(nullable = false, length = 500)
     private String descripcion;
 
-    private String tipoRecurso;  // Video, Documento, etc.
+    @Enumerated(EnumType.STRING) // Esto guarda el nombre del enum como texto
+    @Column(nullable = false)
+    private TipoRecurso tipoRecurso;
 
-    private String urlRecurso;   // URL para acceder al recurso educativo
+    @Column(nullable = false)
+    private String urlRecurso;  // URL de acceso al recurso
+
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = true)
+    private Usuario usuario;
 }

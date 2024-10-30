@@ -1,6 +1,7 @@
 package GTns_TestV.model.enums;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public enum Aptitud {
     C(Arrays.asList(2, 15, 46, 51)),
@@ -19,5 +20,14 @@ public enum Aptitud {
 
     public List<Integer> getPreguntas() {
         return preguntas;
+    }
+
+    public static Aptitud fromPregunta(int pregunta) {
+        for (Aptitud aptitud : Aptitud.values()) {
+            if (aptitud.getPreguntas().contains(pregunta)) {
+                return aptitud;
+            }
+        }
+        throw new IllegalArgumentException("No se encontró Aptitud para la pregunta: " + pregunta);
     }
 }

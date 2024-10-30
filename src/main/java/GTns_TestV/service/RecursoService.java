@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface RecursoService {
     RecursoResponseDTO crearRecurso(RecursoCreateDTO recursoCreateDTO);
+
     List<RecursoResponseDTO> listarRecursos();
 
     List<RecursoResponseDTO> buscarRecursos(String titulo, String descripcion);

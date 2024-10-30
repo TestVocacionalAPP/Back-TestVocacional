@@ -4,5 +4,5 @@ import java.io.ByteArrayInputStream;
 import java.util.Map;
 
 public interface ReportService {
-    ByteArrayInputStream generarReportePDF(Map<String, Map<String, Integer>> resultadoTest);
+    ByteArrayInputStream generarReportePDF(Map<String, Object> resultados);
 }

@@ -68,10 +68,9 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
-    public TestResponseDTO obtenerTestPorId(Long id) {
-        Test test = testRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Test no encontrado"));
-        return testMapper.toResponseDTO(test);
+    public Test obtenerTestPorId(Long id) {
+        return testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test no encontrado")); // Retorna directamente el Test
     }
 
     @Override
@@ -98,21 +97,17 @@ public class TestServiceImpl implements TestService {
         List<Pregunta> preguntas = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
             String line;
-
             // Ignorar la primera línea (encabezado)
             br.readLine();
-
             while ((line = br.readLine()) != null) {
                 // Verificar y procesar cada línea
                 if (line.trim().isEmpty()) {
                     continue;  // Ignorar líneas vacías
                 }
-
                 String[] values = line.split(",", 2);  // Dividir solo en la primera coma
                 if (values.length != 2) {
                     throw new RuntimeException("Formato de línea inválido en el archivo CSV: " + line);
                 }
-
                 try {
                     Pregunta pregunta = new Pregunta();
                     pregunta.setEnunciado(values[0].trim().replace("\"", "")); // Remover comillas si las hay
@@ -137,9 +132,5 @@ public class TestServiceImpl implements TestService {
         // Usa el mapper para convertir el test a TestConPreguntasDTO
         return testMapper.toTestConPreguntasDTO(test);
     }
-
-
-
-
 
 }
