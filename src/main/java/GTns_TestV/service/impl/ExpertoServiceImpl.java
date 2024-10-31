@@ -7,8 +7,12 @@ import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.dto.mapper.ExpertoMapper;
 import GTns_TestV.model.entity.Experto;
 
+import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.enums.Role;
 import GTns_TestV.service.ExpertoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,9 +27,19 @@ public class ExpertoServiceImpl implements ExpertoService {
 
     @Override
     public ExpertoResponseDTO crearExperto(ExpertoCreateDTO expertoCreateDTO) {
-        Experto experto = expertoMapper.toEntity(expertoCreateDTO); // Convierte DTO a entidad
-        Experto savedExperto = expertoRepository.save(experto); // Guarda el experto
-        return expertoMapper.toResponseDTO(savedExperto); // Convierte la entidad guardada a DTO
+        // Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioAutenticado = (Usuario) authentication.getPrincipal();
+
+        // Verificar si el usuario tiene el rol de ADMIN
+        if (!usuarioAutenticado.getRole().equals(Role.ADMIN)) {
+            throw new SecurityException("Acceso denegado. Solo los administradores pueden crear expertos.");
+        }
+
+        // Proseguir con la creación del experto
+        Experto experto = expertoMapper.toEntity(expertoCreateDTO);
+        Experto savedExperto = expertoRepository.save(experto);
+        return expertoMapper.toResponseDTO(savedExperto);
     }
 
     @Override
