@@ -39,5 +39,17 @@ public class ExpertoController {
     }
 
 
+    @GetMapping("/obtenerExpertoPorId/{id}")
+    public ResponseEntity<ExpertoResponseDTO> obtenerExpertoPorId(@PathVariable Long id) {
+        ExpertoResponseDTO experto = expertoService.obtenerExpertoPorId(id);
+        return ResponseEntity.ok(experto);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping("/eliminarExperto/{id}")
+    public ResponseEntity<Void> eliminarExperto(@PathVariable Long id) {
+        expertoService.eliminarExperto(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }

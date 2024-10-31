@@ -69,6 +69,7 @@ public class ExpertoServiceImpl implements ExpertoService {
 
     @Override
     public void eliminarExperto(Long id) {
+
         expertoRepository.deleteById(id); // Elimina el experto por ID
     }
 }
