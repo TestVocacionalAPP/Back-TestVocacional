@@ -3,7 +3,7 @@ package GTns_TestV.model.enums;
 import GTns_TestV.model.entity.Resultado;
 
 public enum ChasideCategory {
-    C("Área Administrativa",
+    C("Area Administrativa",
             new Resultado[]{
                     new Resultado("Organización", "I"),
                     new Resultado("Supervisión", "I"),
@@ -19,7 +19,7 @@ public enum ChasideCategory {
                     new Resultado("Responsable", "A"),
                     new Resultado("Ambicioso", "A")}),
 
-    H("Área de Humanidades y Ciencias Sociales y Jurídicas",
+    H("Area de Humanidades y Ciencias Sociales y Jurídicas",
             new Resultado[]{
                     new Resultado("Precisión Verbal", "I"),
                     new Resultado("Organización", "I"),
@@ -35,7 +35,7 @@ public enum ChasideCategory {
                     new Resultado("Sagaz", "A"),
                     new Resultado("Imaginativo", "A")}),
 
-    A("Área Artística",
+    A("Area Artística",
             new Resultado[]{
                     new Resultado("Estético", "I"),
                     new Resultado("Armónico", "I"),
@@ -50,7 +50,7 @@ public enum ChasideCategory {
                     new Resultado("Innovador", "A"),
                     new Resultado("Intuitivo", "A")}),
 
-    S("Área de Ciencias de la Salud",
+    S("Area de Ciencias de la Salud",
             new Resultado[]{
                     new Resultado("Asistir", "I"),
                     new Resultado("Investigar", "I"),
@@ -66,7 +66,7 @@ public enum ChasideCategory {
                     new Resultado("Respetuoso", "A"),
                     new Resultado("Persuasivo", "A")}),
 
-    I("Área de Enseñanzas Técnicas",
+    I("Area de Enseñanzas Técnicas",
             new Resultado[]{
                     new Resultado("Cálculo", "I"),
                     new Resultado("Científico", "I"),
@@ -80,7 +80,7 @@ public enum ChasideCategory {
                     new Resultado("Analítico", "A"),
                     new Resultado("Rígido", "A")}),
 
-    D("Área de Defensa y Seguridad",
+    D("Area de Defensa y Seguridad",
             new Resultado[]{
                     new Resultado("Justicia", "I"),
                     new Resultado("Equidad", "I"),
@@ -94,7 +94,7 @@ public enum ChasideCategory {
                     new Resultado("Agresivo", "A"),
                     new Resultado("Persuasivo", "A")}),
 
-    E("Área de Ciencias Experimentales",
+    E("Area de Ciencias Experimentales",
             new Resultado[]{
                     new Resultado("Investigación", "I"),
                     new Resultado("Orden", "I"),

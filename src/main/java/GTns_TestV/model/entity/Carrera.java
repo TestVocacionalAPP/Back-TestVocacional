@@ -1,7 +1,7 @@
 package GTns_TestV.model.entity;
 
 import jakarta.persistence.*;
-import GTns_TestV.model.enums.ChasideCategory; // Asegúrate de importar tu enum
+import GTns_TestV.model.enums.ChasideCategory; // Importa tu enum
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
