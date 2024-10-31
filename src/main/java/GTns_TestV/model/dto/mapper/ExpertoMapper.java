@@ -43,9 +43,11 @@ public class ExpertoMapper {
 
     // Convertir ExpertoUpdateDTO a entidad Experto
     public void updateEntity(ExpertoUpdateDTO expertoUpdateDTO, Experto experto) {
+        experto.setNombre(expertoUpdateDTO.getNombre());
+        experto.setApellido(expertoUpdateDTO.getApellido());
         experto.setEspecialidad(expertoUpdateDTO.getEspecialidad());
         experto.setDescripcion(expertoUpdateDTO.getDescripcion());
         experto.setTarifa(expertoUpdateDTO.getTarifa());
-        // Puedes omitir la actualización de calificación si no es parte del DTO de actualización
+
     }
 }

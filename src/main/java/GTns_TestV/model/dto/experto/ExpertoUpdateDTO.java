@@ -8,6 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ExpertoUpdateDTO {
+    private String nombre;
+    private String apellido;
     private String especialidad;
     private String descripcion;
     private double tarifa;

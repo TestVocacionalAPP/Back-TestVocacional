@@ -26,5 +26,18 @@ public class ExpertoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoExperto);
     }
 
+    @GetMapping("/todos")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<ExpertoResponseDTO>> obtenerTodosLosExpertos() {
+        List<ExpertoResponseDTO> expertos = expertoService.obtenerTodosLosExpertos();
+        return ResponseEntity.ok(expertos);
+    }
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<ExpertoResponseDTO> actualizarExperto(@PathVariable Long id, @RequestBody ExpertoUpdateDTO expertoUpdateDTO) {
+        ExpertoResponseDTO expertoActualizado = expertoService.actualizarExperto(id, expertoUpdateDTO);
+        return ResponseEntity.ok(expertoActualizado);
+    }
+
+
 
 }
