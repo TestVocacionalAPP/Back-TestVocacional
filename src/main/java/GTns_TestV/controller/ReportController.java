@@ -20,25 +20,4 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService reportService;
-    private final RespuestaService respuestaService;
-
-    @GetMapping("/test/pdf")
-    public ResponseEntity<InputStreamResource> generarReportePDF(@RequestParam Long historialTestId) {
-        // Calcular los resultados del test usando el historialTestId
-        Map<String, Object> resultadosTest = respuestaService.calcularFilaConMayorRespuestas(historialTestId);
-
-        // Generar el PDF
-        ByteArrayInputStream pdfStream = reportService.generarReportePDF(resultadosTest);
-
-        // Crear headers para la respuesta HTTP
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "inline; filename=resultado_test.pdf");
-
-        // Devolver el archivo PDF como respuesta
-        return ResponseEntity.ok()
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_PDF)
-                .body(new InputStreamResource(pdfStream));
-    }
 }

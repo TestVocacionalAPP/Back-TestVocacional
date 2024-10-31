@@ -1,6 +1,6 @@
 package GTns_TestV.model.dto.mapper;
 
-import GTns_TestV.model.dto.PreguntaDTO;
+import GTns_TestV.model.dto.pregunta.PreguntaDTO;
 import GTns_TestV.model.entity.Pregunta;
 import GTns_TestV.model.enums.TipoPregunta;
 import org.springframework.stereotype.Component;

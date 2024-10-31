@@ -1,7 +1,7 @@
 package GTns_TestV.controller;
 
-import GTns_TestV.model.dto.UsuarioDTO;
-import GTns_TestV.model.dto.UsuarioPerfilDTO;
+import GTns_TestV.model.dto.usuario.UsuarioDTO;
+import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
@@ -9,7 +9,6 @@ import GTns_TestV.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController // Marca esta clase como un controlador REST de Spring

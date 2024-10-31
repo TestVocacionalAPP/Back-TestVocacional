@@ -3,7 +3,7 @@ package GTns_TestV.service.impl;
 import GTns_TestV.infra.repository.PreguntaRepository;
 import GTns_TestV.infra.repository.UsuarioRepository;
 import GTns_TestV.model.dto.mapper.TestMapper;
-import GTns_TestV.model.dto.test.TestConPreguntasDTO;
+
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
 import GTns_TestV.model.dto.test.TestUpdateDTO;
@@ -91,6 +91,7 @@ public class TestServiceImpl implements TestService {
     @Override
     @Transactional
     public void cargarPreguntasDesdeCSV(MultipartFile file, Long idTest, Long idUsuario) {
+        // Buscar el test por id y usuario
         Test test = testRepository.findByIdAndUsuarioId(idTest, idUsuario)
                 .orElseThrow(() -> new RuntimeException("Test no encontrado o no pertenece al usuario"));
 
@@ -124,13 +125,7 @@ public class TestServiceImpl implements TestService {
 
         preguntaRepository.saveAll(preguntas);
     }
-    @Override
-    public TestConPreguntasDTO obtenerPreguntasPorTest(Long testId) {
-        Test test = testRepository.findById(testId)
-                .orElseThrow(() -> new RuntimeException("Test no encontrado"));
 
-        // Usa el mapper para convertir el test a TestConPreguntasDTO
-        return testMapper.toTestConPreguntasDTO(test);
-    }
+
 
 }

@@ -1,4 +1,4 @@
-package GTns_TestV.model.dto;
+package GTns_TestV.model.dto.usuario;
 
 import lombok.Data;
 import jakarta.validation.constraints.Email;

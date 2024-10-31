@@ -1,4 +1,4 @@
-package GTns_TestV.model.dto;
+package GTns_TestV.model.dto.pregunta;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

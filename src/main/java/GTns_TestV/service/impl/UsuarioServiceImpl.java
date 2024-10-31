@@ -1,9 +1,9 @@
 package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.UsuarioRepository;
-import GTns_TestV.model.dto.UsuarioPerfilDTO;
+import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
 import GTns_TestV.model.dto.mapper.UsuarioMapper;
-import GTns_TestV.model.dto.UsuarioDTO;
+import GTns_TestV.model.dto.usuario.UsuarioDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.security.JwtService;
