@@ -121,4 +121,11 @@ public class TestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error procesando el archivo: " + e.getMessage());
         }
     }
+
+    // Endpoint para listar todas las preguntas de un test específico
+    @GetMapping("/{idTest}/preguntas")
+    public ResponseEntity<List<Pregunta>> obtenerPreguntasPorTest(@PathVariable Long idTest) {
+        List<Pregunta> preguntas = testService.obtenerPreguntasPorTest(idTest);
+        return ResponseEntity.ok(preguntas);
+    }
 }

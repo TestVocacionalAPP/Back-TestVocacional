@@ -12,15 +12,12 @@ import GTns_TestV.model.entity.Pregunta;
 import GTns_TestV.infra.repository.TestRepository;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.service.TestService;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -71,6 +68,15 @@ public class TestServiceImpl implements TestService {
     public Test obtenerTestPorId(Long id) {
         return testRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Test no encontrado")); // Retorna directamente el Test
+    }
+    @Override
+    public List<Pregunta> obtenerPreguntasPorTest(Long idTest) {
+        // Buscar el test por ID
+        Test test = testRepository.findById(idTest)
+                .orElseThrow(() -> new RuntimeException("Test no encontrado"));
+
+        // Obtener las preguntas asociadas a ese test
+        return preguntaRepository.findByTest(test);
     }
 
     @Override

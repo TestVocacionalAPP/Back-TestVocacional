@@ -25,4 +25,6 @@ public interface TestService {
 
     TestResponseDTO actualizarTest(Long idTest, TestUpdateDTO testUpdateDTO);
 
+    List<Pregunta> obtenerPreguntasPorTest(Long idTest);
+
 }
