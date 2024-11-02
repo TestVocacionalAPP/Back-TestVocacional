@@ -42,14 +42,6 @@ public class UsuarioController {
         return ResponseEntity.ok(tokenResponse); // Devuelve el token en la respuesta
     }
 
-    //@PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/crear-experto")
-    public ResponseEntity<Usuario> crearExperto(@RequestBody UsuarioDTO expertoDTO) {
-        // Crear un experto en el sistema
-        Usuario experto = usuarioService.crearExperto(expertoDTO);
-        return new ResponseEntity<>(experto, HttpStatus.CREATED);
-    }
-
     @DeleteMapping("/eliminar")
     public ResponseEntity<String> eliminarCuenta() {
         // Obtener el usuario autenticado y eliminar su cuenta

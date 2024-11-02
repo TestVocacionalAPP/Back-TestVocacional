@@ -5,6 +5,8 @@ import GTns_TestV.infra.repository.PreguntaRepository;
 import GTns_TestV.infra.repository.RespuestaRepository;
 import GTns_TestV.infra.repository.TestRepository;
 
+import GTns_TestV.model.dto.pregunta.PreguntaDTO;
+import GTns_TestV.model.dto.test.TestConPreguntasDTO;
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
 import GTns_TestV.model.entity.*;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tests")
@@ -122,10 +125,25 @@ public class TestController {
         }
     }
 
-    // Endpoint para listar todas las preguntas de un test específico
     @GetMapping("/{idTest}/preguntas")
-    public ResponseEntity<List<Pregunta>> obtenerPreguntasPorTest(@PathVariable Long idTest) {
-        List<Pregunta> preguntas = testService.obtenerPreguntasPorTest(idTest);
-        return ResponseEntity.ok(preguntas);
+    public ResponseEntity<TestConPreguntasDTO> obtenerPreguntasPorTest(@PathVariable Long idTest) {
+        Test test = testService.obtenerTestPorId(idTest);
+        List<PreguntaDTO> preguntas = testService.obtenerPreguntasPorTest(idTest).stream()
+                .map(pregunta -> new PreguntaDTO(
+                        pregunta.getIdPregunta(),
+                        pregunta.getEnunciado(),
+                        pregunta.getRespuestaSiNo(),
+                        pregunta.getPuntajePregunta(),
+                        pregunta.getTipoPregunta().name()
+                ))
+                .collect(Collectors.toList());
+
+        TestConPreguntasDTO testConPreguntasDTO = TestConPreguntasDTO.builder()
+                .id(test.getId())
+                .titulo(test.getTitulo())
+                .preguntas(preguntas)
+                .build();
+
+        return ResponseEntity.ok(testConPreguntasDTO);
     }
 }

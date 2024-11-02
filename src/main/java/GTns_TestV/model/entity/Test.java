@@ -18,13 +18,9 @@ public class Test {
     private Long id;
 
     @Column(nullable = false, length = 255)
-    private String titulo; // El título o nombre del test
+    private String titulo;
 
-    @Column(nullable = false)
-    private Double puntaje; // Puntaje obtenido por el usuario en este test
-
-    // Relación OneToMany con la clase Pregunta
-    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "test", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Pregunta> preguntas;
 
     @ManyToOne

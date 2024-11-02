@@ -24,7 +24,8 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", usuario.getId());
         claims.put("username", usuario.getUsername());
-        claims.put("correo", usuario.getCorreo()); // Aquí nos aseguramos de que el correo se establece correctamente
+        claims.put("correo", usuario.getCorreo());
+        claims.put("role", usuario.getRole().name());
 
         return generateToken(claims, usuario.getUsername());
     }

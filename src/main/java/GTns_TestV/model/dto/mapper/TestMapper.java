@@ -1,10 +1,10 @@
 package GTns_TestV.model.dto.mapper;
 
 import GTns_TestV.model.dto.pregunta.PreguntaDTO;
-
 import GTns_TestV.model.dto.test.TestCreationDTO;
 import GTns_TestV.model.dto.test.TestUpdateDTO;
 import GTns_TestV.model.dto.test.TestResponseDTO;
+import GTns_TestV.model.dto.test.TestConPreguntasDTO;
 import GTns_TestV.model.entity.Pregunta;
 import GTns_TestV.model.entity.Test;
 import GTns_TestV.model.entity.Usuario;
@@ -20,7 +20,6 @@ public class TestMapper {
     public Test toEntity(TestCreationDTO dto, Usuario usuario) {
         return Test.builder()
                 .titulo(dto.getTitulo())
-                .puntaje(dto.getPuntaje())
                 .usuario(usuario)
                 .build();
     }
@@ -30,7 +29,6 @@ public class TestMapper {
         return TestResponseDTO.builder()
                 .id(test.getId())
                 .titulo(test.getTitulo())
-                .puntaje(test.getPuntaje())
                 .build();
     }
 
@@ -38,14 +36,25 @@ public class TestMapper {
     public TestUpdateDTO toUpdateDTO(Test test) {
         return TestUpdateDTO.builder()
                 .titulo(test.getTitulo())
-                .puntaje(test.getPuntaje())
+                .build();
+    }
+
+    // Convierte de Test a TestConPreguntasDTO
+    public TestConPreguntasDTO toTestConPreguntasDTO(Test test) {
+        List<PreguntaDTO> preguntasDTO = test.getPreguntas().stream()
+                .map(this::toPreguntaDTO)
+                .collect(Collectors.toList());
+
+        return TestConPreguntasDTO.builder()
+                .id(test.getId())
+                .titulo(test.getTitulo())
+                .preguntas(preguntasDTO)
                 .build();
     }
 
     // Actualiza un Test existente con datos de TestUpdateDTO
     public Test updateEntity(TestUpdateDTO dto, Test testExistente) {
         testExistente.setTitulo(dto.getTitulo() != null ? dto.getTitulo() : testExistente.getTitulo());
-        testExistente.setPuntaje(dto.getPuntaje() != null ? dto.getPuntaje() : testExistente.getPuntaje());
         return testExistente;
     }
 

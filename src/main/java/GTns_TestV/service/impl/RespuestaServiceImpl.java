@@ -185,8 +185,6 @@ public class RespuestaServiceImpl implements RespuestaService {
     }
 
 
-
-
     private Map<String, Integer> ordenaResultados(Map<String, Integer> resultados, List<String> categorias) {
         Map<String, Integer> ordenados = new LinkedHashMap<>();
         for (String categoria : categorias) {

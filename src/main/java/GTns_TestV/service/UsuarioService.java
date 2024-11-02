@@ -14,8 +14,6 @@ public interface UsuarioService {
 
     Usuario getAuthenticatedUser();
 
-    Usuario crearExperto(UsuarioDTO usuarioDTO);
-
     void eliminarCuenta();
 
     Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO);
