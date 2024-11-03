@@ -23,7 +23,7 @@ public class Carrera {
     @Column(nullable = false)
     private String descripcion;
 
-    @Enumerated(EnumType.STRING) // Para almacenar el enum como cadena
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ChasideCategory categoria; // Campo que representa la categoría de CHASIDE
+    private ChasideCategory categoria;
 }
