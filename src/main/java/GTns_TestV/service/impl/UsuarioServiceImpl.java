@@ -77,4 +77,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         // Guardar los cambios
         return usuarioRepository.save(usuarioActual);
     }
+
+    @Override
+    public UsuarioPerfilDTO listarPerfilUsuario() {
+        Usuario usuario = getAuthenticatedUser();
+        return new UsuarioPerfilDTO(
+                usuario.getNombre(),
+                usuario.getApellido(),
+                usuario.getTelefono(),
+                usuario.getCorreo()
+        );
+    }
+
 }

@@ -1,11 +1,15 @@
 package GTns_TestV.model.dto.usuario;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsuarioPerfilDTO {
 
     @NotBlank(message = "El nombre no puede estar vacío")

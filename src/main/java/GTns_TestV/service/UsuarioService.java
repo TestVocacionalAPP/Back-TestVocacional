@@ -17,4 +17,6 @@ public interface UsuarioService {
     void eliminarCuenta();
 
     Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO);
+
+    UsuarioPerfilDTO listarPerfilUsuario();
 }
