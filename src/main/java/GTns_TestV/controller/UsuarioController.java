@@ -2,10 +2,12 @@ package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.usuario.UsuarioDTO;
 import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
+import GTns_TestV.model.dto.usuario.UsuarioUpdateDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
 import GTns_TestV.service.UsuarioService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +38,16 @@ public class UsuarioController {
         return ResponseEntity.ok("Cuenta eliminada exitosamente");
     }
 
-    @PutMapping("/editar-perfil")
-    public ResponseEntity<Usuario> editarPerfil(@RequestBody UsuarioPerfilDTO usuarioPerfilDTO) {
-        Usuario usuarioActualizado = usuarioService.actualizarPerfil(usuarioPerfilDTO);
-        return ResponseEntity.ok(usuarioActualizado);
+    @PutMapping("/actualizar")
+    public ResponseEntity<UsuarioPerfilDTO> actualizarPerfilUsuario(@Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+        UsuarioPerfilDTO perfilActualizado = new UsuarioPerfilDTO(
+                usuarioUpdateDTO.getNombre(),
+                usuarioUpdateDTO.getApellido(),
+                usuarioUpdateDTO.getTelefono(),
+                usuarioUpdateDTO.getCorreo()
+        );
+        usuarioService.actualizarPerfil(usuarioUpdateDTO);
+        return ResponseEntity.ok(perfilActualizado);
     }
 
     @GetMapping("/perfil")

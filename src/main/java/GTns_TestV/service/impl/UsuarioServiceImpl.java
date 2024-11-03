@@ -4,6 +4,7 @@ import GTns_TestV.infra.repository.UsuarioRepository;
 import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
 import GTns_TestV.model.dto.mapper.UsuarioMapper;
 import GTns_TestV.model.dto.usuario.UsuarioDTO;
+import GTns_TestV.model.dto.usuario.UsuarioUpdateDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.security.JwtService;
@@ -64,19 +65,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO) {
-        // Obtener el usuario autenticado
-        Usuario usuarioActual = getAuthenticatedUser();
+    public Usuario actualizarPerfil(UsuarioUpdateDTO usuarioUpdateDTO) {
+        Usuario usuario = getAuthenticatedUser();
 
-        // Actualizar los datos del perfil
-        usuarioActual.setNombre(usuarioPerfilDTO.getNombre());
-        usuarioActual.setApellido(usuarioPerfilDTO.getApellido());
-        usuarioActual.setTelefono(usuarioPerfilDTO.getTelefono());
-        usuarioActual.setCorreo(usuarioPerfilDTO.getCorreo());
+        // Actualizar los campos del usuario con los datos del DTO
+        usuario.setNombre(usuarioUpdateDTO.getNombre());
+        usuario.setApellido(usuarioUpdateDTO.getApellido());
+        usuario.setTelefono(usuarioUpdateDTO.getTelefono());
+        usuario.setCorreo(usuarioUpdateDTO.getCorreo());
 
-        // Guardar los cambios
-        return usuarioRepository.save(usuarioActual);
+        // Guardar los cambios en la base de datos
+        return usuarioRepository.save(usuario);
     }
+
 
     @Override
     public UsuarioPerfilDTO listarPerfilUsuario() {

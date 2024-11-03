@@ -2,6 +2,7 @@ package GTns_TestV.service;
 
 import GTns_TestV.model.dto.usuario.UsuarioDTO;
 import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
+import GTns_TestV.model.dto.usuario.UsuarioUpdateDTO;
 import GTns_TestV.security.LoginRequest;
 import GTns_TestV.security.TokenResponse;
 import GTns_TestV.model.entity.Usuario;
@@ -16,7 +17,7 @@ public interface UsuarioService {
 
     void eliminarCuenta();
 
-    Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO);
+    Usuario actualizarPerfil(UsuarioUpdateDTO usuarioUpdateDTO);
 
     UsuarioPerfilDTO listarPerfilUsuario();
 }
