@@ -81,13 +81,23 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public UsuarioPerfilDTO listarPerfilUsuario() {
-        Usuario usuario = getAuthenticatedUser();
-        return new UsuarioPerfilDTO(
-                usuario.getNombre(),
-                usuario.getApellido(),
-                usuario.getTelefono(),
-                usuario.getCorreo()
-        );
+        try {
+            Usuario usuario = getAuthenticatedUser();
+            if (usuario == null) {
+                throw new RuntimeException("Usuario no encontrado");
+            }
+            return new UsuarioPerfilDTO(
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getTelefono(),
+                    usuario.getCorreo()
+            );
+        } catch (Exception e) {
+            // Imprime el error en los logs para depuración
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener el perfil del usuario", e);
+        }
     }
+
 
 }

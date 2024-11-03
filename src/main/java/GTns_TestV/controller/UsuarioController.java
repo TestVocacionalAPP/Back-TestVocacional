@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/usuarios")
 @RequiredArgsConstructor
@@ -33,10 +36,13 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/eliminar")
-    public ResponseEntity<String> eliminarCuenta() {
-                usuarioService.eliminarCuenta();
-        return ResponseEntity.ok("Cuenta eliminada exitosamente");
+    public ResponseEntity<Map<String, String>> eliminarCuenta() {
+        usuarioService.eliminarCuenta();
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Cuenta eliminada exitosamente");
+        return ResponseEntity.ok(response);
     }
+
 
     @PutMapping("/actualizar")
     public ResponseEntity<UsuarioPerfilDTO> actualizarPerfilUsuario(@Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
