@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HistorialResponseDTO {
-    private Long idHistorial;
-    private Long idUsuario;
+    private Long id;
     private Long idTest;
+    private String nombreTest; // Nuevo campo para el nombre del test
     private LocalDateTime fecha;
     private String categoriaMayorInteres;
     private String categoriaMayorAptitud;
