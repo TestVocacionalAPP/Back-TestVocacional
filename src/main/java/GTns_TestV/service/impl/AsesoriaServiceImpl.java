@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,8 +35,12 @@ public class AsesoriaServiceImpl implements AsesoriaService {
                 .experto(experto)
                 .asunto(asesoriaCreateDTO.getAsunto())
                 .fechaSolicitada(asesoriaCreateDTO.getFechaSolicitada())
+                .descripcion(asesoriaCreateDTO.getDescripcion())  // Nuevo campo
+                .metodoContacto(asesoriaCreateDTO.getMetodoContacto())  // Nuevo campo
+                .duracion(asesoriaCreateDTO.getDuracion())  // Nuevo campo
                 .estado("PENDIENTE")
                 .build();
+
 
         Asesoria savedAsesoria = asesoriaRepository.save(asesoria);
 
@@ -76,7 +81,57 @@ public class AsesoriaServiceImpl implements AsesoriaService {
                 asesoria.getAsunto(),
                 asesoria.getFechaSolicitada(),
                 asesoria.getFechaConfirmada(),
-                asesoria.getEstado()
+                asesoria.getEstado(),
+                asesoria.getUsuario().getNombre(),
+                asesoria.getUsuario().getCorreo()
         );
     }
+    @Override
+    public AsesoriaResponseDTO aceptarSolicitud(Long asesoriaId, Long expertoId) {
+        Asesoria asesoria = asesoriaRepository.findById(asesoriaId)
+                .orElseThrow(() -> new RuntimeException("Asesoría no encontrada"));
+
+        if (!asesoria.getExperto().getId().equals(expertoId)) {
+            throw new SecurityException("Acceso denegado. Solo el experto asignado puede aceptar esta asesoría.");
+        }
+
+        asesoria.setEstado("ACEPTADA");
+        asesoria.setFechaConfirmada(LocalDateTime.now());
+        Asesoria asesoriaAceptada = asesoriaRepository.save(asesoria);
+        return mapToResponseDTO(asesoriaAceptada);
+    }
+
+    @Override
+    public AsesoriaResponseDTO rechazarSolicitud(Long asesoriaId, Long expertoId) {
+        Asesoria asesoria = asesoriaRepository.findById(asesoriaId)
+                .orElseThrow(() -> new RuntimeException("Asesoría no encontrada"));
+
+        if (!asesoria.getExperto().getId().equals(expertoId)) {
+            throw new SecurityException("Acceso denegado. Solo el experto asignado puede rechazar esta asesoría.");
+        }
+
+        asesoria.setEstado("RECHAZADA");
+        Asesoria asesoriaRechazada = asesoriaRepository.save(asesoria);
+        return mapToResponseDTO(asesoriaRechazada);
+    }
+    @Override
+    public List<String> verificarYNotificarCitas(Long usuarioId) {
+        List<Asesoria> asesorias = asesoriaRepository.findByUsuarioId(usuarioId);
+        List<String> notificaciones = new ArrayList<>();
+
+        for (Asesoria asesoria : asesorias) {
+            if ("CONFIRMADA".equals(asesoria.getEstado())) {
+                String mensaje = "Notificación: Tu solicitud de asesoría con el experto "
+                        + asesoria.getExperto().getNombre() + " ha sido aceptada.";
+                notificaciones.add(mensaje);
+            } else if ("RECHAZADA".equals(asesoria.getEstado())) {
+                String mensaje = "Notificación: Tu solicitud de asesoría con el experto "
+                        + asesoria.getExperto().getNombre() + " ha sido rechazada.";
+                notificaciones.add(mensaje);
+            }
+        }
+        return notificaciones;
+    }
+
+
 }

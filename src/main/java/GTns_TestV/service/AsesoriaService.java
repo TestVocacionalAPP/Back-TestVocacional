@@ -10,4 +10,9 @@ public interface AsesoriaService {
     AsesoriaResponseDTO confirmarAsesoria(Long asesoriaId, Long expertoId);
     List<AsesoriaResponseDTO> obtenerAsesoriasPorUsuario(Long usuarioId);
     List<AsesoriaResponseDTO> obtenerAsesoriasPorExperto(Long expertoId);
+
+    AsesoriaResponseDTO aceptarSolicitud(Long asesoriaId, Long expertoId);
+    AsesoriaResponseDTO rechazarSolicitud(Long asesoriaId, Long expertoId);
+
+    List<String> verificarYNotificarCitas(Long usuarioId);
 }

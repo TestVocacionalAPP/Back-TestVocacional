@@ -17,7 +17,9 @@ public class AsesoriaMapper {
                 asesoria.getAsunto(),
                 asesoria.getFechaSolicitada(),
                 asesoria.getFechaConfirmada(),
-                asesoria.getEstado()
+                asesoria.getEstado(),
+                asesoria.getUsuario().getNombre(),
+                asesoria.getUsuario().getCorreo()
         );
     }
 

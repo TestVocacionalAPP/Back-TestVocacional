@@ -34,4 +34,10 @@ public class Asesoria {
     private LocalDateTime fechaConfirmada;
 
     private String estado;
+    @Column(nullable = true)  // Agregar el campo 'descripcion'
+    private String descripcion;
+
+    private String metodoContacto;
+
+    private Integer duracion;
 }

@@ -14,4 +14,6 @@ public class AsesoriaResponseDTO {
     private LocalDateTime fechaSolicitada;
     private LocalDateTime fechaConfirmada;
     private String estado;
+    private String nombreUsuario; // Nombre del usuario solicitante
+    private String correoUsuario; // Correo del usuario solicitante
 }

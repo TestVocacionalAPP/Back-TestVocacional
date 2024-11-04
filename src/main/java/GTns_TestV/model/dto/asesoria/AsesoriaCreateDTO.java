@@ -11,4 +11,8 @@ public class AsesoriaCreateDTO {
     private Long expertoId;
     private String asunto;
     private LocalDateTime fechaSolicitada;
+    private String descripcion;
+    private String metodoContacto;
+    private Integer duracion;
+
 }
