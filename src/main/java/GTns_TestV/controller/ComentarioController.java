@@ -22,5 +22,10 @@ public class ComentarioController {
         return ResponseEntity.ok(comentario);
     }
 
-
+    @GetMapping("/experto/{expertoId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<Comentario>> listarComentariosPorExperto(@PathVariable Long expertoId) {
+        List<Comentario> comentarios = comentarioService.listarComentariosPorExperto(expertoId);
+        return ResponseEntity.ok(comentarios);
+    }
 }
