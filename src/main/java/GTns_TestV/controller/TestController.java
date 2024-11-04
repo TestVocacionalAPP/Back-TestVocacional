@@ -14,26 +14,32 @@ import GTns_TestV.model.enums.TipoPregunta;
 import GTns_TestV.service.PreguntaService;
 import GTns_TestV.service.TestService;
 import GTns_TestV.service.UsuarioService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tests")
 @RequiredArgsConstructor
 public class TestController {
-
     private final TestService testService;
     private final UsuarioService usuarioService;
     private final TestRepository testRepository;
@@ -59,7 +65,6 @@ public class TestController {
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("El archivo está vacío");
         }
-
         try {
             // Verificar si el test existe
             Test test = testRepository.findById(idTest)
@@ -145,5 +150,21 @@ public class TestController {
                 .build();
 
         return ResponseEntity.ok(testConPreguntasDTO);
+    }
+    @PostMapping("/crear-con-preguntas")
+    public ResponseEntity<TestResponseDTO> crearTestConPreguntas(
+            @RequestPart("titulo") String titulo,
+            @RequestPart("file") MultipartFile file) {
+        try {
+            // Obtenemos el usuario autenticado
+            Usuario usuario = usuarioService.getAuthenticatedUser();
+
+            // Llamamos al servicio para crear el test y cargar las preguntas desde el archivo
+            TestResponseDTO nuevoTest = testService.crearTestConPreguntas(titulo, usuario.getId(), file);
+
+            return ResponseEntity.ok(nuevoTest);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

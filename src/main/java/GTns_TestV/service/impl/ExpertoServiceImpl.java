@@ -13,6 +13,7 @@ import GTns_TestV.service.ExpertoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,8 @@ public class ExpertoServiceImpl implements ExpertoService {
 
     private final ExpertoRepository expertoRepository; // Repositorio para manejar Expertos
     private final ExpertoMapper expertoMapper; // Mapper para convertir entre DTOs y entidades
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public ExpertoResponseDTO crearExperto(ExpertoCreateDTO expertoCreateDTO) {
@@ -31,13 +34,14 @@ public class ExpertoServiceImpl implements ExpertoService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Usuario usuarioAutenticado = (Usuario) authentication.getPrincipal();
 
-        // Verificar si el usuario tiene el rol de ADMIN
         if (!usuarioAutenticado.getRole().equals(Role.ADMIN)) {
             throw new SecurityException("Acceso denegado. Solo los administradores pueden crear expertos.");
         }
 
-        // Proseguir con la creación del experto
+        // Convertir DTO a entidad y encriptar la contraseña
         Experto experto = expertoMapper.toEntity(expertoCreateDTO);
+        experto.setPassword(passwordEncoder.encode(expertoCreateDTO.getPassword())); // Encriptar la contraseña
+
         Experto savedExperto = expertoRepository.save(experto);
         return expertoMapper.toResponseDTO(savedExperto);
     }
