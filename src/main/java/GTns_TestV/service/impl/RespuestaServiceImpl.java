@@ -89,11 +89,16 @@ public class RespuestaServiceImpl implements RespuestaService {
             }
         }
 
-        // Guardar los resultados en el historial
-        historialTest.setCategoriaMayorInteres(obtenerCategoriaMayor(sumaInteres));
-        historialTest.setCategoriaMayorAptitud(obtenerCategoriaMayor(sumaAptitud));
-        historialTest.setMensajeIntereses("Tus intereses están relacionados con la categoría calculada.");
-        historialTest.setMensajeCarreras("Las carreras relacionadas con tus aptitudes calculadas.");
+        // Llamar a calcularFilaConMayorRespuestas para obtener los mensajes generados
+        Map<String, Object> resultadoCalculado = calcularFilaConMayorRespuestas(historialTest.getId(), test.getId());
+        String mensajeIntereses = (String) resultadoCalculado.get("mensajeIntereses");
+        String mensajeCarreras = (String) resultadoCalculado.get("mensajeCarreras");
+
+        // Guardar los mensajes generados en el historial
+        historialTest.setCategoriaMayorInteres((String) resultadoCalculado.get("CategoriaMayorInteres"));
+        historialTest.setCategoriaMayorAptitud((String) resultadoCalculado.get("CategoriaMayorAptitud"));
+        historialTest.setMensajeIntereses(mensajeIntereses);
+        historialTest.setMensajeCarreras(mensajeCarreras);
 
         // Guardar el historial actualizado
         historialTestRepository.save(historialTest);

@@ -1,8 +1,11 @@
 package GTns_TestV.controller;
 
+import GTns_TestV.infra.repository.ExpertoRepository;
 import GTns_TestV.model.dto.experto.ExpertoCreateDTO;
 import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.dto.experto.ExpertoResponseDTO;
+import GTns_TestV.model.dto.mapper.ExpertoMapper;
+import GTns_TestV.model.entity.Experto;
 import GTns_TestV.service.ExpertoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/expertos")
@@ -18,6 +22,8 @@ public class ExpertoController {
 
     @Autowired
     private ExpertoService expertoService;
+    private ExpertoRepository expertoRepository;
+    private ExpertoMapper expertoMapper;
 
     @PostMapping("/crear")
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,4 +58,9 @@ public class ExpertoController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/buscarPorEspecialidad")
+    public ResponseEntity<List<ExpertoResponseDTO>> buscarPorEspecialidad(@RequestParam String especialidad) {
+        List<ExpertoResponseDTO> expertos = expertoService.buscarExpertosPorEspecialidad(especialidad);
+        return ResponseEntity.ok(expertos);
+    }
 }

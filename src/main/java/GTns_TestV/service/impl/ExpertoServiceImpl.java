@@ -76,4 +76,13 @@ public class ExpertoServiceImpl implements ExpertoService {
 
         expertoRepository.deleteById(id); // Elimina el experto por ID
     }
+
+    @Override
+    public List<ExpertoResponseDTO> buscarExpertosPorEspecialidad(String especialidad) {
+        List<Experto> expertos = expertoRepository.findByEspecialidad(especialidad);
+        return expertos.stream()
+                .map(expertoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
 }
