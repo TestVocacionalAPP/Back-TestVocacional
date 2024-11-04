@@ -5,7 +5,7 @@ import GTns_TestV.model.entity.Test;
 import java.util.Map;
 
 public interface HistorialTestService {
-    void guardarResultadosEnHistorial(Usuario usuario, Test test, Map<String, Integer> resultados);
+    /*void guardarResultadosEnHistorial(Usuario usuario, Test test, Map<String, Integer> resultados);
     Map<String, Integer> obtenerResultadosHistoricos(Long idUsuario, Long idTest);
-    Map<String, Object> obtenerResultadosDelTest(Long historialTestId); // Declaración pública
+    Map<String, Object> obtenerResultadosDelTest(Long historialTestId); // Declaración pública*/
 }

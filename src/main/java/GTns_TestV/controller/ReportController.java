@@ -18,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/reportes")
 public class ReportController {
-
+/*
     @Autowired
     private ReportService reportService;
 
@@ -62,5 +62,5 @@ public class ReportController {
                 .status(HttpStatus.OK)
                 .headers(headers)
                 .body(pdfStream.readAllBytes());
-    }
+    }*/
 }

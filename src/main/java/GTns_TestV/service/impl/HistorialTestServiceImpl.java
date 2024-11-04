@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class HistorialTestServiceImpl implements HistorialTestService {
-
+/*
     private final HistorialTestRepository historialTestRepository;
     private final RespuestaService respuestaService; // Asegúrate de inyectar el servicio de respuesta
 
@@ -65,4 +66,10 @@ public class HistorialTestServiceImpl implements HistorialTestService {
 
         return resultados; // Retorna el mapa con los resultados calculados
     }
+
+    @Override
+    public List<HistorialTest> obtenerHistorialPorUsuario(Long idUsuario) {
+        return historialTestRepository.findByUsuarioId(idUsuario);
+    }
+*/
 }

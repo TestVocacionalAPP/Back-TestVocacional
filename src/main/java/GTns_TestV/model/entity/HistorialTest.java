@@ -27,6 +27,9 @@ public class HistorialTest {
 
     private LocalDateTime fecha;
 
-    private Integer interes;  // Campo para almacenar el resultado de Interés
-    private Integer aptitud;  // Campo para almacenar el resultado de Aptitud
+    // Campos adicionales para los resultados
+    private String categoriaMayorInteres; // Campo para la categoría de mayor interés
+    private String categoriaMayorAptitud; // Campo para la categoría de mayor aptitud
+    private String mensajeIntereses; // Mensaje sobre los intereses
+    private String mensajeCarreras; // Mensaje sobre las carreras
 }

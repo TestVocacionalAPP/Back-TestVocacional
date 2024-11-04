@@ -18,7 +18,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class HistorialTestController {
 
-    private final HistorialTestService historialTestService;
+   /* private final HistorialTestService historialTestService;
     private final TestService testService; // Asegúrate de tener esto
     private final UsuarioService usuarioService;
 
@@ -43,4 +43,6 @@ public class HistorialTestController {
         Map<String, Integer> resultados = historialTestService.obtenerResultadosHistoricos(idUsuario, idTest);
         return ResponseEntity.ok(resultados);
     }
+
+*/
 }
