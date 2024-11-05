@@ -10,16 +10,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExpertoMapper {
 
-    // Convertir entidad Experto a ExpertoResponseDTO
     public ExpertoResponseDTO toResponseDTO(Experto experto) {
         return new ExpertoResponseDTO(
                 experto.getId(),
                 experto.getNombre(),
                 experto.getApellido(),
                 experto.getEspecialidad(),
-                experto.getCalificacion(),
+                experto.getLikes(),
                 experto.getDescripcion(),
-                experto.getTarifa()
+                experto.getTarifa(),
+                experto.getTelefono(),
+                experto.getCorreo()
         );
     }
 
@@ -35,7 +36,7 @@ public class ExpertoMapper {
         experto.setEspecialidad(expertoCreateDTO.getEspecialidad());
         experto.setDescripcion(expertoCreateDTO.getDescripcion());
         experto.setTarifa(expertoCreateDTO.getTarifa());
-        experto.setCalificacion(0); // Inicializa la calificación a 0
+        experto.setLikes(0); // Inicializa la calificación a 0
         experto.setRole(Role.EXPERTO); // Asigna el rol EXPERTO
         return experto;
     }

@@ -15,4 +15,5 @@ public interface AsesoriaService {
     AsesoriaResponseDTO rechazarSolicitud(Long asesoriaId, Long expertoId);
 
     List<String> verificarYNotificarCitas(Long usuarioId);
+    List<AsesoriaResponseDTO> obtenerNotificaciones(Long expertoId);
 }

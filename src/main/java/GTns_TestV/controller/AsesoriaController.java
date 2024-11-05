@@ -2,6 +2,7 @@ package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
 import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
+import GTns_TestV.model.entity.Asesoria;
 import GTns_TestV.model.entity.Experto;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.security.JwtService;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/asesorias")
@@ -81,13 +83,23 @@ public class AsesoriaController {
 
     @GetMapping("/verificar")
     public ResponseEntity<List<String>> verificarYNotificarCitas() {
-        // Obtiene el usuario autenticado
         Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
-
-        // Llama al servicio para verificar y obtener notificaciones
         List<String> notificaciones = asesoriaService.verificarYNotificarCitas(usuarioAutenticado.getId());
-
-        // Retorna las notificaciones como respuesta
         return ResponseEntity.ok(notificaciones);
     }
+
+    @GetMapping("/expertos/notificaciones")
+    public ResponseEntity<List<AsesoriaResponseDTO>> obtenerNotificaciones() {
+        Usuario expertoAutenticado = usuarioService.getAuthenticatedUser();
+
+        if (!(expertoAutenticado instanceof Experto)) {
+            throw new RuntimeException("El usuario autenticado no es un experto.");
+        }
+
+        List<AsesoriaResponseDTO> notificaciones = asesoriaService.obtenerNotificaciones(expertoAutenticado.getId());
+        return ResponseEntity.ok(notificaciones);
+    }
+
+
+
 }

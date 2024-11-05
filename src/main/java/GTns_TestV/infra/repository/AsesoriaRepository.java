@@ -8,4 +8,6 @@ import java.util.List;
 public interface AsesoriaRepository extends JpaRepository<Asesoria, Long> {
     List<Asesoria> findByExpertoId(Long expertoId);
     List<Asesoria> findByUsuarioId(Long usuarioId);
+    List<Asesoria> findByExpertoIdAndEstado(Long expertoId, String estado);
+
 }

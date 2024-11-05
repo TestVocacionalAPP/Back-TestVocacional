@@ -35,17 +35,21 @@ public class AsesoriaServiceImpl implements AsesoriaService {
                 .experto(experto)
                 .asunto(asesoriaCreateDTO.getAsunto())
                 .fechaSolicitada(asesoriaCreateDTO.getFechaSolicitada())
-                .descripcion(asesoriaCreateDTO.getDescripcion())  // Nuevo campo
-                .metodoContacto(asesoriaCreateDTO.getMetodoContacto())  // Nuevo campo
-                .duracion(asesoriaCreateDTO.getDuracion())  // Nuevo campo
+                .descripcion(asesoriaCreateDTO.getDescripcion())
+                .metodoContacto(asesoriaCreateDTO.getMetodoContacto())
+                .duracion(asesoriaCreateDTO.getDuracion())
                 .estado("PENDIENTE")
                 .build();
 
-
         Asesoria savedAsesoria = asesoriaRepository.save(asesoria);
+
+        // Generar la notificación
+        String mensajeNotificacion = "Nueva solicitud de asesoría recibida para el experto: " + experto.getNombre();
+        notificarExperto(mensajeNotificacion, experto);
 
         return mapToResponseDTO(savedAsesoria);
     }
+
 
     @Override
     public AsesoriaResponseDTO confirmarAsesoria(Long asesoriaId, Long expertoId) {
@@ -133,5 +137,18 @@ public class AsesoriaServiceImpl implements AsesoriaService {
         return notificaciones;
     }
 
+
+    private void notificarExperto(String mensaje, Experto experto) {
+        // Enviar o almacenar la notificación para el experto
+        System.out.println("Notificación para " + experto.getNombre() + ": " + mensaje);
+
+        // También puedes crear una lógica para almacenar las notificaciones si en un futuro
+        // decides implementar una entidad `Notificacion` en la base de datos.
+    }
+    @Override
+    public List<AsesoriaResponseDTO> obtenerNotificaciones(Long expertoId) {
+        List<Asesoria> asesoriasPendientes = asesoriaRepository.findByExpertoIdAndEstado(expertoId, "PENDIENTE");
+        return asesoriasPendientes.stream().map(this::mapToResponseDTO).collect(Collectors.toList());
+    }
 
 }

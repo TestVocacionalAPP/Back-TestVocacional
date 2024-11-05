@@ -12,7 +12,9 @@ public class ExpertoResponseDTO {
     private String nombre;
     private String apellido;
     private String especialidad;
-    private double calificacion;
+    private int likes;
     private String descripcion;
     private double tarifa;
+    private String telefono;
+    private String correo;
 }

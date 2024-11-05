@@ -10,13 +10,17 @@ import GTns_TestV.model.entity.Experto;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.service.ExpertoService;
+import GTns_TestV.service.UsuarioService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +30,8 @@ public class ExpertoServiceImpl implements ExpertoService {
     private final ExpertoRepository expertoRepository; // Repositorio para manejar Expertos
     private final ExpertoMapper expertoMapper; // Mapper para convertir entre DTOs y entidades
     private final PasswordEncoder passwordEncoder;
-
+    private final Map<Long, Map<Long, Boolean>> likesByUsuario = new HashMap<>();
+    private final UsuarioService usuarioService;
 
     @Override
     public ExpertoResponseDTO crearExperto(ExpertoCreateDTO expertoCreateDTO) {
@@ -83,6 +88,31 @@ public class ExpertoServiceImpl implements ExpertoService {
         return expertos.stream()
                 .map(expertoMapper::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional
+    public ExpertoResponseDTO toggleLike(Long expertoId, Long usuarioId) {
+        Experto experto = expertoRepository.findById(expertoId)
+                .orElseThrow(() -> new RuntimeException("Experto no encontrado"));
+
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Obtener o inicializar el mapa de "likes" del experto
+        Map<Long, Boolean> likesPorUsuario = likesByUsuario.computeIfAbsent(expertoId, k -> new HashMap<>());
+
+        boolean yaDioLike = likesPorUsuario.getOrDefault(usuarioId, false);
+
+        if (yaDioLike) {
+            experto.setLikes(experto.getLikes() - 1); // Quita el "like"
+            likesPorUsuario.put(usuarioId, false); // Cambia el estado a "no le gusta"
+        } else {
+            experto.setLikes(experto.getLikes() + 1); // Agrega un "like"
+            likesPorUsuario.put(usuarioId, true); // Cambia el estado a "le gusta"
+        }
+
+        expertoRepository.save(experto);
+        return expertoMapper.toResponseDTO(experto);
     }
 
 }

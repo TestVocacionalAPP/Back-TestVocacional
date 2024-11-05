@@ -13,4 +13,6 @@ public interface ExpertoService {
     ExpertoResponseDTO obtenerExpertoPorId(Long id);
     void eliminarExperto(Long id);
     List<ExpertoResponseDTO> buscarExpertosPorEspecialidad(String especialidad);
+    ExpertoResponseDTO toggleLike(Long expertoId, Long usuarioId);
+
 }
