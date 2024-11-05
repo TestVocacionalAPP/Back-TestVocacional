@@ -54,4 +54,12 @@ public class ComentarioController {
         return ResponseEntity.ok(responseDTO);
     }
 
+
+    @DeleteMapping("/eliminar/{comentarioId}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<Void> eliminarComentario(@PathVariable Long comentarioId) {
+        Long usuarioId = usuarioService.getAuthenticatedUser().getId();
+        comentarioService.eliminarComentario(comentarioId, usuarioId);
+        return ResponseEntity.noContent().build();
+    }
 }
