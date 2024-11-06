@@ -3,6 +3,7 @@ package GTns_TestV.service.impl;
 import GTns_TestV.infra.repository.CompraRecursoRepository;
 import GTns_TestV.infra.repository.RecursoRepository;
 import GTns_TestV.model.dto.CompraRequestDTO;
+import GTns_TestV.model.dto.CompraResponseDTO;
 import GTns_TestV.model.dto.PagoDTO;
 import GTns_TestV.model.dto.recurso.RecursoCreateDTO;
 import GTns_TestV.model.dto.recurso.RecursoResponseDTO;
@@ -16,6 +17,7 @@ import GTns_TestV.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,23 +60,14 @@ public class RecursoServiceImpl implements RecursoService {
 
 
     @Override
-    public List<RecursoResponseDTO> buscarRecursos(String titulo, String descripcion) {
-        List<Recurso> recursos;
-
-        if (titulo != null && descripcion != null) {
-            recursos = recursoRepository.findByTituloContainingAndDescripcionContaining(titulo, descripcion);
-        } else if (titulo != null) {
-            recursos = recursoRepository.findByTituloContaining(titulo);
-        } else if (descripcion != null) {
-            recursos = recursoRepository.findByDescripcionContaining(descripcion);
-        } else {
-            recursos = recursoRepository.findAll(); // Si no se proveen filtros, devolver todos los recursos
-        }
+    public List<RecursoResponseDTO> buscarRecursosPorTitulo(String titulo) {
+        List<Recurso> recursos = recursoRepository.findByTituloContaining(titulo);
 
         return recursos.stream()
                 .map(recurso -> recursoMapper.toResponseDTO(recurso, false)) // tieneAcceso en false por defecto
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public RecursoResponseDTO actualizarRecurso(Long id, RecursoCreateDTO recursoCreateDTO) {
@@ -101,7 +94,7 @@ public class RecursoServiceImpl implements RecursoService {
     }
 
 
-    public RecursoResponseDTO comprarRecurso(Long idRecurso, PagoDTO pagoDTO) {
+    public CompraResponseDTO comprarRecurso(Long idRecurso, PagoDTO pagoDTO, Integer cantidad) {
         Usuario usuario = usuarioService.getAuthenticatedUser();
         Recurso recurso = recursoRepository.findById(idRecurso)
                 .orElseThrow(() -> new RuntimeException("Recurso no encontrado"));
@@ -122,16 +115,48 @@ public class RecursoServiceImpl implements RecursoService {
         }
         String ultimosDigitosTarjeta = numeroTarjeta.substring(numeroTarjeta.length() - 4);
 
+        // Crear la compra del recurso con la cantidad asignada
         CompraRecurso compraRecurso = CompraRecurso.builder()
                 .usuario(usuario)
                 .recurso(recurso)
                 .estado(EstadoCompra.APROBADO)
                 .ultimosDigitosTarjeta(ultimosDigitosTarjeta)
                 .tipoTarjeta(pagoDTO.getTipoTarjeta())
+                .cantidad(cantidad) // Asignar la cantidad aquí
+                .fecha(LocalDate.now()) // Asignar la fecha actual
                 .build();
+
+        // Guardar la compra en el repositorio
         compraRecursoRepository.save(compraRecurso);
 
-        return recursoMapper.toResponseDTO(recurso, true);
+        // Crear y devolver un CompraResponseDTO
+        CompraResponseDTO compraResponseDTO = new CompraResponseDTO();
+        compraResponseDTO.setId(compraRecurso.getId());
+        compraResponseDTO.setRecursoTitulo(recurso.getTitulo());
+        compraResponseDTO.setPrecio(recurso.getPrecio().doubleValue());
+        compraResponseDTO.setCantidad(compraRecurso.getCantidad());
+        compraResponseDTO.setFecha(compraRecurso.getFecha() != null ? compraRecurso.getFecha().toString() : "Sin fecha");
+
+        return compraResponseDTO;
     }
+
+
+
+    @Override
+    public List<CompraResponseDTO> obtenerHistorialCompras() {
+        Usuario usuario = usuarioService.getAuthenticatedUser();
+        List<CompraRecurso> compras = compraRecursoRepository.findByUsuarioId(usuario.getId());
+
+        return compras.stream().map(compra -> {
+            CompraResponseDTO compraResponseDTO = new CompraResponseDTO();
+            compraResponseDTO.setId(compra.getId());
+            compraResponseDTO.setRecursoTitulo(compra.getRecurso().getTitulo());
+            compraResponseDTO.setPrecio(compra.getRecurso().getPrecio().doubleValue());
+            compraResponseDTO.setCantidad(compra.getCantidad());
+            compraResponseDTO.setFecha(compra.getFecha() != null ? compra.getFecha().toString() : "Sin fecha"); // Manejo de nulos
+            return compraResponseDTO;
+        }).collect(Collectors.toList());
+    }
+
 
 }

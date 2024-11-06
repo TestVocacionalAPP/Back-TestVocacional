@@ -9,7 +9,5 @@ public interface RecursoRepository extends JpaRepository<Recurso, Long> {
 
     List<Recurso> findByTituloContaining(String titulo);
 
-    List<Recurso> findByDescripcionContaining(String descripcion);
 
-    List<Recurso> findByTituloContainingAndDescripcionContaining(String titulo, String descripcion);
 }

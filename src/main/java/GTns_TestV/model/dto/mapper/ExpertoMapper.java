@@ -21,7 +21,8 @@ public class ExpertoMapper {
                 experto.getDescripcion(),
                 experto.getTarifa(),
                 experto.getTelefono(),
-                experto.getCorreo()
+                experto.getCorreo(),
+                experto.getImagenBase64()
         );
     }
 

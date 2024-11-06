@@ -17,4 +17,5 @@ public class ExpertoResponseDTO {
     private double tarifa;
     private String telefono;
     private String correo;
+    private String imagenBase64;
 }

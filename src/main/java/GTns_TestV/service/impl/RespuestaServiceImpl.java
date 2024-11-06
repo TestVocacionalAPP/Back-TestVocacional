@@ -201,6 +201,20 @@ public class RespuestaServiceImpl implements RespuestaService {
         return ordenados;
     }
 
+    public List<Carrera> obtenerCarrerasSugeridas(Long historialTestId, Long idTest) {
+        // Calculamos las carreras sugeridas
+        Map<String, Object> resultadoCalculado = calcularFilaConMayorRespuestas(historialTestId, idTest);
+        String mensajeCarreras = (String) resultadoCalculado.get("mensajeCarreras");
+
+        // Extraemos los nombres de las carreras del mensaje
+        List<String> nombresCarreras = Arrays.stream(mensajeCarreras
+                        .replace("Las carreras relacionadas a tus intereses y aptitudes son: ", "")
+                        .split(", "))
+                .collect(Collectors.toList());
+
+        // Consultamos las carreras en la base de datos
+        return carreraRepository.findByNombreIn(nombresCarreras);
+    }
 
 
 }

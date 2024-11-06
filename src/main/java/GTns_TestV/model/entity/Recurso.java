@@ -44,7 +44,7 @@ public class Recurso {
     @Column(nullable = false)
     private boolean esPremium;
 
-    private boolean tieneAcceso;
+        private boolean tieneAcceso;
 
     @Column(nullable = false)
     private BigDecimal precio;

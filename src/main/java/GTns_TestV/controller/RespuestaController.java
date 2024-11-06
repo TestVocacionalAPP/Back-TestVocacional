@@ -2,6 +2,7 @@ package GTns_TestV.controller;
 
 import GTns_TestV.infra.repository.TestRepository;
 import GTns_TestV.model.dto.respuesta.RespuestaDTO;
+import GTns_TestV.model.entity.Carrera;
 import GTns_TestV.model.entity.HistorialTest;
 import GTns_TestV.model.entity.Test;
 import GTns_TestV.model.entity.Usuario;
@@ -56,5 +57,10 @@ public class RespuestaController {
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(response);
+    }
+
+    @GetMapping("/{historialTestId}/carreras-sugeridas")
+    public List<Carrera> obtenerCarrerasSugeridas(@PathVariable Long historialTestId, @RequestParam Long idTest) {
+        return respuestaService.obtenerCarrerasSugeridas(historialTestId, idTest);
     }
 }
