@@ -30,6 +30,9 @@ public class HistorialTest {
     // Campos adicionales para los resultados
     private String categoriaMayorInteres; // Campo para la categoría de mayor interés
     private String categoriaMayorAptitud; // Campo para la categoría de mayor aptitud
+
+    @Column(columnDefinition = "TEXT")
     private String mensajeIntereses; // Mensaje sobre los intereses
+    @Column(columnDefinition = "TEXT")
     private String mensajeCarreras; // Mensaje sobre las carreras
 }

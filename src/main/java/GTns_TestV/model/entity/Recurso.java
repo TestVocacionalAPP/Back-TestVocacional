@@ -1,8 +1,11 @@
 package GTns_TestV.model.entity;
 
+import GTns_TestV.model.enums.CategoriaRecurso;
 import GTns_TestV.model.enums.TipoRecurso;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "recursos")
@@ -33,4 +36,17 @@ public class Recurso {
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = true)
     private Usuario usuario;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CategoriaRecurso categoriaRecurso;
+
+    @Column(nullable = false)
+    private boolean esPremium;
+
+    private boolean tieneAcceso;
+
+    @Column(nullable = false)
+    private BigDecimal precio;
+
 }
