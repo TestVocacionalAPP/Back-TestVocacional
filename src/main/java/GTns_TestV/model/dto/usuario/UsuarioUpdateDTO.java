@@ -25,4 +25,5 @@ public class UsuarioUpdateDTO {
     @Email(message = "El correo debe ser válido")
     @NotBlank(message = "El correo es obligatorio")
     private String correo;
+    private String imagenBase64;
 }

@@ -24,4 +24,6 @@ public interface UsuarioService {
     UsuarioPerfilDTO listarPerfilUsuario();
 
     Optional<Usuario> obtenerUsuarioPorId(Long usuarioId);
+
+    Usuario actualizarImagenPerfil(String imagenBase64);
 }

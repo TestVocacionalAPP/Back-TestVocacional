@@ -23,4 +23,6 @@ public class UsuarioPerfilDTO {
 
     @Email(message = "Debe proporcionar un correo electrónico válido")
     private String correo;
+
+    private String imagenBase64;
 }

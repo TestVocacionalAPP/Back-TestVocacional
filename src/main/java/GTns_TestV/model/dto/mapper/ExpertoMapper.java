@@ -1,6 +1,7 @@
 package GTns_TestV.model.dto.mapper;
 
 import GTns_TestV.model.dto.experto.ExpertoCreateDTO;
+import GTns_TestV.model.dto.experto.ExpertoPerfilDTO;
 import GTns_TestV.model.dto.experto.ExpertoResponseDTO;
 import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.entity.Experto;
@@ -24,7 +25,21 @@ public class ExpertoMapper {
         );
     }
 
-    // Convertir ExpertoCreateDTO a entidad Experto
+    // Método para convertir un objeto Experto a ExpertoPerfilDTO
+    public ExpertoPerfilDTO toPerfilDTO(Experto experto) {
+        return new ExpertoPerfilDTO(
+                experto.getNombre(),
+                experto.getApellido(),
+                experto.getEspecialidad(),
+                experto.getDescripcion(),
+                experto.getTarifa(),
+                experto.getLikes(),
+                experto.getImagenBase64(),
+                experto.getCorreo(),
+                experto.getTelefono()
+        );
+    }
+
     // Convertir ExpertoCreateDTO a entidad Experto
     public Experto toEntity(ExpertoCreateDTO expertoCreateDTO) {
         Experto experto = new Experto();
@@ -41,7 +56,6 @@ public class ExpertoMapper {
         return experto;
     }
 
-
     // Convertir ExpertoUpdateDTO a entidad Experto
     public void updateEntity(ExpertoUpdateDTO expertoUpdateDTO, Experto experto) {
         experto.setNombre(expertoUpdateDTO.getNombre());
@@ -49,6 +63,5 @@ public class ExpertoMapper {
         experto.setEspecialidad(expertoUpdateDTO.getEspecialidad());
         experto.setDescripcion(expertoUpdateDTO.getDescripcion());
         experto.setTarifa(expertoUpdateDTO.getTarifa());
-
     }
 }

@@ -1,6 +1,7 @@
 package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.usuario.UsuarioDTO;
+import GTns_TestV.model.dto.usuario.UsuarioImagenDTO;
 import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
 import GTns_TestV.model.dto.usuario.UsuarioUpdateDTO;
 import GTns_TestV.model.entity.Usuario;
@@ -50,7 +51,8 @@ public class UsuarioController {
                 usuarioUpdateDTO.getNombre(),
                 usuarioUpdateDTO.getApellido(),
                 usuarioUpdateDTO.getTelefono(),
-                usuarioUpdateDTO.getCorreo()
+                usuarioUpdateDTO.getCorreo(),
+                usuarioUpdateDTO.getImagenBase64()
         );
         usuarioService.actualizarPerfil(usuarioUpdateDTO);
         return ResponseEntity.ok(perfilActualizado);
@@ -59,5 +61,11 @@ public class UsuarioController {
     @GetMapping("/perfil")
     public UsuarioPerfilDTO obtenerPerfilUsuario() {
         return usuarioService.listarPerfilUsuario();
+    }
+
+    @PutMapping("/perfil/imagen")
+    public ResponseEntity<Usuario> actualizarImagenPerfil(@RequestBody UsuarioImagenDTO usuarioImagenDTO) {
+        Usuario usuarioActualizado = usuarioService.actualizarImagenPerfil(usuarioImagenDTO.getImagenBase64());
+        return ResponseEntity.ok(usuarioActualizado);
     }
 }

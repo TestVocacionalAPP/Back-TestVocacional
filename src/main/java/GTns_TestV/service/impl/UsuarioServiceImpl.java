@@ -17,6 +17,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
@@ -92,7 +93,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                     usuario.getNombre(),
                     usuario.getApellido(),
                     usuario.getTelefono(),
-                    usuario.getCorreo()
+                    usuario.getCorreo(),
+                    usuario.getImagenBase64()
             );
         } catch (Exception e) {
             // Imprime el error en los logs para depuración
@@ -104,5 +106,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public Optional<Usuario> obtenerUsuarioPorId(Long usuarioId) {
         return usuarioRepository.findById(usuarioId);
+    }
+
+    @Override
+    public Usuario actualizarImagenPerfil(String imagenBase64) {
+        if (!StringUtils.hasText(imagenBase64)) {
+            throw new IllegalArgumentException("La imagen no puede estar vacía.");
+        }
+
+        Usuario usuario = getAuthenticatedUser();
+        usuario.setImagenBase64(imagenBase64);  // Actualiza la imagen en Base64
+        return usuarioRepository.save(usuario);
     }
 }

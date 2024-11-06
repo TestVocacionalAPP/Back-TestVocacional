@@ -2,6 +2,7 @@ package GTns_TestV.controller;
 
 import GTns_TestV.infra.repository.ExpertoRepository;
 import GTns_TestV.model.dto.experto.ExpertoCreateDTO;
+import GTns_TestV.model.dto.experto.ExpertoPerfilDTO;
 import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.dto.experto.ExpertoResponseDTO;
 import GTns_TestV.model.dto.mapper.ExpertoMapper;
@@ -15,7 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -77,5 +80,28 @@ public class ExpertoController {
         ExpertoResponseDTO expertoActualizado = expertoService.toggleLike(expertoId, usuarioAutenticado.getId());
         return ResponseEntity.ok(expertoActualizado);
     }
+
+    @GetMapping("/perfil")
+    public ResponseEntity<ExpertoPerfilDTO> obtenerPerfilExpertoAutenticado() {
+        ExpertoPerfilDTO perfil = expertoService.obtenerPerfilExperto(null);
+        return ResponseEntity.ok(perfil);
+    }
+
+    @PutMapping("/editar/perfil")
+    public ResponseEntity<ExpertoPerfilDTO> actualizarPerfilExperto(@RequestBody ExpertoPerfilDTO expertoPerfilDTO) {
+        ExpertoPerfilDTO perfilActualizado = expertoService.actualizarPerfilExperto(expertoPerfilDTO);
+        return ResponseEntity.ok(perfilActualizado);
+    }
+    @PutMapping("/perfil/imagen")
+    public ResponseEntity<Map<String, String>> actualizarImagenPerfil(@RequestBody Map<String, String> request) {
+        String imagenBase64 = request.get("imagenBase64");
+        expertoService.actualizarImagenPerfil(imagenBase64);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Imagen de perfil actualizada exitosamente");
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

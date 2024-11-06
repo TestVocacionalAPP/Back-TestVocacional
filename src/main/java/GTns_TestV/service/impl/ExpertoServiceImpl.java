@@ -2,6 +2,7 @@ package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.ExpertoRepository;
 import GTns_TestV.model.dto.experto.ExpertoCreateDTO;
+import GTns_TestV.model.dto.experto.ExpertoPerfilDTO;
 import GTns_TestV.model.dto.experto.ExpertoResponseDTO;
 import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.dto.mapper.ExpertoMapper;
@@ -115,4 +116,56 @@ public class ExpertoServiceImpl implements ExpertoService {
         return expertoMapper.toResponseDTO(experto);
     }
 
+    @Override
+    public ExpertoPerfilDTO obtenerPerfilExperto(Long id) {
+        Experto experto;
+
+        if (id == null) {
+            // Obtener el perfil del experto autenticado
+            Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+
+            if (usuarioAutenticado.getRole() != Role.EXPERTO) {
+                throw new SecurityException("Acceso denegado. Solo los expertos pueden acceder a esta función.");
+            }
+
+            experto = (Experto) usuarioAutenticado;
+        } else {
+            // Obtener el perfil de un experto por ID
+            experto = expertoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Experto no encontrado con ID: " + id));
+        }
+
+        return expertoMapper.toPerfilDTO(experto); // Mapeo a DTO para el perfil
+    }
+
+    @Override
+    public ExpertoPerfilDTO actualizarPerfilExperto(ExpertoPerfilDTO expertoPerfilDTO) {
+        Experto experto = obtenerExpertoAutenticado();
+        experto.setNombre(expertoPerfilDTO.getNombre());
+        experto.setApellido(expertoPerfilDTO.getApellido());
+        experto.setEspecialidad(expertoPerfilDTO.getEspecialidad());
+        experto.setDescripcion(expertoPerfilDTO.getDescripcion());
+        experto.setTarifa(expertoPerfilDTO.getTarifa());
+
+        expertoRepository.save(experto); // Guarda los cambios
+        return expertoMapper.toPerfilDTO(experto); // Retorna el perfil actualizado
+    }
+
+    @Override
+    public void actualizarImagenPerfil(String imagenBase64) {
+        Experto experto = obtenerExpertoAutenticado();
+        experto.setImagenBase64(imagenBase64); // Actualiza la imagen en Base64
+
+        expertoRepository.save(experto); // Guarda los cambios en la base de datos
+    }
+
+    private Experto obtenerExpertoAutenticado() {
+        Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+
+        if (usuarioAutenticado instanceof Experto) {
+            return (Experto) usuarioAutenticado;
+        } else {
+            throw new SecurityException("El usuario autenticado no es un experto.");
+        }
+    }
 }
