@@ -49,4 +49,6 @@ public class Recurso {
     @Column(nullable = false)
     private BigDecimal precio;
 
+    @Column(nullable = false)
+    private String imagen;
 }

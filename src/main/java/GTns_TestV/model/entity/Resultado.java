@@ -16,4 +16,5 @@ public class Resultado {
     public String getTipo() {
         return tipo;
     }
+
 }

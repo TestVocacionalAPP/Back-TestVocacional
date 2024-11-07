@@ -1,23 +1,21 @@
-# Usar una imagen base con JDK 11 y Maven
+# Etapa de construcción
 FROM maven:3.8.4-openjdk-17 AS build
 
 # Establecer un directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de tu proyecto al directorio de trabajo
-COPY . /app
-
-# Ejecutar Maven para construir el proyecto
+# Copiar todos los archivos y construir el proyecto
+COPY . .
 RUN mvn clean package -DskipTests
 
+# Etapa final
+FROM openjdk:17-jdk-slim
 
-FROM openjdk:17
-
-# Exponer el puerto que utilizará la aplicación
+# Exponer el puerto en el que correrá la aplicación
 EXPOSE 8080
 
-# Copiar el archivo JAR construido desde la etapa anterior
+# Copiar el archivo JAR generado en la etapa de construcción
 COPY --from=build /app/target/demo-0.0.1-SNAPSHOT.jar /app/demo-0.0.1-SNAPSHOT.jar
 
-# Establecer el punto de entrada para ejecutar la aplicación
+# Ejecutar la aplicación
 ENTRYPOINT ["java", "-jar", "/app/demo-0.0.1-SNAPSHOT.jar"]

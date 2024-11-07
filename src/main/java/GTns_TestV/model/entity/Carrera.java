@@ -17,7 +17,7 @@ public class Carrera {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nombre;
 
     @Column(nullable = false)
@@ -26,4 +26,7 @@ public class Carrera {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChasideCategory categoria;
+
+    @Column(nullable = true) // Puedes hacer que sea nullable si no siempre se proporciona
+    private String imagen;
 }
