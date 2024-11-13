@@ -59,11 +59,17 @@ public class Usuario implements UserDetails {
     @JsonIgnore // Evita que Jackson serialice la colección de tests
     private List<Test> tests;
 
+    @Column(name = "imagen_base64", columnDefinition = "TEXT")
+    private String imagenBase64;
+
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
-
+    public Usuario(Long id) {
+        this.id = id;
+    }
     @Override
     public String getUsername() {
         return this.correo;

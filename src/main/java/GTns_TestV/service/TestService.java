@@ -13,6 +13,8 @@ public interface TestService {
 
     TestResponseDTO crearTest(TestCreationDTO testCreationDTO, Long idUsuario);
 
+    TestResponseDTO crearTestConPreguntas(String titulo, Long idUsuario, MultipartFile file);
+
     List<TestResponseDTO> obtenerTodosLosTests();
 
     Test obtenerTestPorId(Long id);

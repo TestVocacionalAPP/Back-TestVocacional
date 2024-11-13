@@ -11,14 +11,23 @@ import GTns_TestV.model.entity.Test;
 import GTns_TestV.model.entity.Pregunta;
 import GTns_TestV.infra.repository.TestRepository;
 import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.enums.TipoPregunta;
 import GTns_TestV.service.TestService;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -131,7 +140,64 @@ public class TestServiceImpl implements TestService {
 
         preguntaRepository.saveAll(preguntas);
     }
+    @Override
+    @Transactional
+    public TestResponseDTO crearTestConPreguntas(String titulo, Long idUsuario, MultipartFile file) {
+        Usuario usuario = usuarioRepository.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // Crear el test
+        Test test = new Test();
+        test.setTitulo(titulo);
+        test.setUsuario(usuario);
+        Test savedTest = testRepository.save(test);
 
+        // Procesar el archivo Excel y cargar las preguntas
+        List<Pregunta> preguntas = new ArrayList<>();
+        try (InputStream inputStream = file.getInputStream(); Workbook workbook = new XSSFWorkbook(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (Row row : sheet) {
+                Cell preguntaCell = row.getCell(0);
+                Cell categoriaCell = row.getCell(1);
+                Cell tipoPreguntaCell = row.getCell(2);
+
+                if (preguntaCell != null && categoriaCell != null && tipoPreguntaCell != null) {
+                    String preguntaTexto = preguntaCell.getStringCellValue().trim();
+                    String categoria = categoriaCell.getStringCellValue().trim().toUpperCase();
+                    String tipoPreguntaStr = tipoPreguntaCell.getStringCellValue().trim().toUpperCase();
+
+                    try {
+                        TipoPregunta tipo = TipoPregunta.valueOf(tipoPreguntaStr);
+                        if (!List.of("C", "H", "A", "S", "I", "D", "E").contains(categoria)) {
+                            throw new RuntimeException("Categoría inválida en la fila: " + (row.getRowNum() + 1));
+                        }
+
+                        Pregunta pregunta = new Pregunta();
+                        pregunta.setEnunciado(preguntaTexto);
+                        pregunta.setTest(savedTest);
+                        pregunta.setTipoPregunta(tipo);
+                        pregunta.setCategoria(categoria);
+
+                        preguntas.add(pregunta);
+
+                    } catch (IllegalArgumentException e) {
+                        throw new RuntimeException("Tipo de pregunta inválido en la fila: " + (row.getRowNum() + 1));
+                    }
+                }
+            }
+
+            if (!preguntas.isEmpty()) {
+                preguntaRepository.saveAll(preguntas);
+            } else {
+                throw new RuntimeException("No se encontraron preguntas válidas para cargar.");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error al leer el archivo Excel", e);
+        }
+
+        return testMapper.toResponseDTO(savedTest);
+    }
 
 }
+

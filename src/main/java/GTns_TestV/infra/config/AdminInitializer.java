@@ -20,12 +20,12 @@ public class AdminInitializer {
     public ApplicationRunner initializeAdmin() {
         return args -> {
             // Verifica si ya existe un usuario con rol ADMIN
-            if (!usuarioRepository.existsByCorreo("admin@example.com")) {
+            if (!usuarioRepository.existsByCorreo("admin@gmail.com")) {
                 Usuario admin = Usuario.builder()
                         .nombre("Admin")
-                        .apellido("Default")
+                        .apellido("Admin")
                         .telefono("123456789")
-                        .correo("admin@example.com")
+                        .correo("admin@gmail.com")
                         .password(passwordEncoder.encode("admin"))  // Encripta la contraseña
                         .role(Role.ADMIN)
                         .build();

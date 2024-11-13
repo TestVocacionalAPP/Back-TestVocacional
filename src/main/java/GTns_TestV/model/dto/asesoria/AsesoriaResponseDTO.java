@@ -1,12 +1,11 @@
 package GTns_TestV.model.dto.asesoria;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AsesoriaResponseDTO {
@@ -14,6 +13,7 @@ public class AsesoriaResponseDTO {
     private String asunto;
     private LocalDateTime fechaSolicitada;
     private LocalDateTime fechaConfirmada;
-    private String usuarioNombre;
-    private String expertoNombre;
+    private String estado;
+    private String nombreUsuario; // Nombre del usuario solicitante
+    private String correoUsuario; // Correo del usuario solicitante
 }

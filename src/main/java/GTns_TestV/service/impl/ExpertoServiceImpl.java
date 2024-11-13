@@ -2,16 +2,26 @@ package GTns_TestV.service.impl;
 
 import GTns_TestV.infra.repository.ExpertoRepository;
 import GTns_TestV.model.dto.experto.ExpertoCreateDTO;
+import GTns_TestV.model.dto.experto.ExpertoPerfilDTO;
 import GTns_TestV.model.dto.experto.ExpertoResponseDTO;
 import GTns_TestV.model.dto.experto.ExpertoUpdateDTO;
 import GTns_TestV.model.dto.mapper.ExpertoMapper;
 import GTns_TestV.model.entity.Experto;
 
+import GTns_TestV.model.entity.Usuario;
+import GTns_TestV.model.enums.Role;
 import GTns_TestV.service.ExpertoService;
+import GTns_TestV.service.UsuarioService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,12 +30,26 @@ public class ExpertoServiceImpl implements ExpertoService {
 
     private final ExpertoRepository expertoRepository; // Repositorio para manejar Expertos
     private final ExpertoMapper expertoMapper; // Mapper para convertir entre DTOs y entidades
+    private final PasswordEncoder passwordEncoder;
+    private final Map<Long, Map<Long, Boolean>> likesByUsuario = new HashMap<>();
+    private final UsuarioService usuarioService;
 
     @Override
     public ExpertoResponseDTO crearExperto(ExpertoCreateDTO expertoCreateDTO) {
-        Experto experto = expertoMapper.toEntity(expertoCreateDTO); // Convierte DTO a entidad
-        Experto savedExperto = expertoRepository.save(experto); // Guarda el experto
-        return expertoMapper.toResponseDTO(savedExperto); // Convierte la entidad guardada a DTO
+        // Obtener el usuario autenticado
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario usuarioAutenticado = (Usuario) authentication.getPrincipal();
+
+        if (!usuarioAutenticado.getRole().equals(Role.ADMIN)) {
+            throw new SecurityException("Acceso denegado. Solo los administradores pueden crear expertos.");
+        }
+
+        // Convertir DTO a entidad y encriptar la contraseña
+        Experto experto = expertoMapper.toEntity(expertoCreateDTO);
+        experto.setPassword(passwordEncoder.encode(expertoCreateDTO.getPassword())); // Encriptar la contraseña
+
+        Experto savedExperto = expertoRepository.save(experto);
+        return expertoMapper.toResponseDTO(savedExperto);
     }
 
     @Override
@@ -55,6 +79,93 @@ public class ExpertoServiceImpl implements ExpertoService {
 
     @Override
     public void eliminarExperto(Long id) {
+
         expertoRepository.deleteById(id); // Elimina el experto por ID
+    }
+
+    @Override
+    public List<ExpertoResponseDTO> buscarExpertosPorEspecialidad(String especialidad) {
+        List<Experto> expertos = expertoRepository.findByEspecialidad(especialidad);
+        return expertos.stream()
+                .map(expertoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional
+    public ExpertoResponseDTO toggleLike(Long expertoId, Long usuarioId) {
+        Experto experto = expertoRepository.findById(expertoId)
+                .orElseThrow(() -> new RuntimeException("Experto no encontrado"));
+
+        Usuario usuario = usuarioService.obtenerUsuarioPorId(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Obtener o inicializar el mapa de "likes" del experto
+        Map<Long, Boolean> likesPorUsuario = likesByUsuario.computeIfAbsent(expertoId, k -> new HashMap<>());
+
+        boolean yaDioLike = likesPorUsuario.getOrDefault(usuarioId, false);
+
+        if (yaDioLike) {
+            experto.setLikes(experto.getLikes() - 1); // Quita el "like"
+            likesPorUsuario.put(usuarioId, false); // Cambia el estado a "no le gusta"
+        } else {
+            experto.setLikes(experto.getLikes() + 1); // Agrega un "like"
+            likesPorUsuario.put(usuarioId, true); // Cambia el estado a "le gusta"
+        }
+
+        expertoRepository.save(experto);
+        return expertoMapper.toResponseDTO(experto);
+    }
+
+    @Override
+    public ExpertoPerfilDTO obtenerPerfilExperto(Long id) {
+        Experto experto;
+
+        if (id == null) {
+            // Obtener el perfil del experto autenticado
+            Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+
+            if (usuarioAutenticado.getRole() != Role.EXPERTO) {
+                throw new SecurityException("Acceso denegado. Solo los expertos pueden acceder a esta función.");
+            }
+
+            experto = (Experto) usuarioAutenticado;
+        } else {
+            // Obtener el perfil de un experto por ID
+            experto = expertoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Experto no encontrado con ID: " + id));
+        }
+
+        return expertoMapper.toPerfilDTO(experto); // Mapeo a DTO para el perfil
+    }
+
+    @Override
+    public ExpertoPerfilDTO actualizarPerfilExperto(ExpertoPerfilDTO expertoPerfilDTO) {
+        Experto experto = obtenerExpertoAutenticado();
+        experto.setNombre(expertoPerfilDTO.getNombre());
+        experto.setApellido(expertoPerfilDTO.getApellido());
+        experto.setEspecialidad(expertoPerfilDTO.getEspecialidad());
+        experto.setDescripcion(expertoPerfilDTO.getDescripcion());
+        experto.setTarifa(expertoPerfilDTO.getTarifa());
+
+        expertoRepository.save(experto); // Guarda los cambios
+        return expertoMapper.toPerfilDTO(experto); // Retorna el perfil actualizado
+    }
+
+    @Override
+    public void actualizarImagenPerfil(String imagenBase64) {
+        Experto experto = obtenerExpertoAutenticado();
+        experto.setImagenBase64(imagenBase64); // Actualiza la imagen en Base64
+
+        expertoRepository.save(experto); // Guarda los cambios en la base de datos
+    }
+
+    private Experto obtenerExpertoAutenticado() {
+        Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+
+        if (usuarioAutenticado instanceof Experto) {
+            return (Experto) usuarioAutenticado;
+        } else {
+            throw new SecurityException("El usuario autenticado no es un experto.");
+        }
     }
 }

@@ -2,34 +2,24 @@ package GTns_TestV.service.impl;
 
 import GTns_TestV.service.ReportService;
 import GTns_TestV.infra.repository.HistorialTestRepository;
-import GTns_TestV.infra.repository.CarreraRepository;
-import GTns_TestV.model.entity.HistorialTest;
-import GTns_TestV.model.entity.Carrera;
-import GTns_TestV.model.enums.ChasideCategory;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
     private final HistorialTestRepository historialTestRepository;
-    private final CarreraRepository carreraRepository;
 
     @Override
     public ByteArrayInputStream generarReportePDF(Map<String, Object> resultadoTest) {
@@ -38,59 +28,51 @@ public class ReportServiceImpl implements ReportService {
         try (PdfDocument pdfDoc = new PdfDocument(new PdfWriter(out))) {
             Document doc = new Document(pdfDoc);
 
-            // Añadir título
-            doc.add(new Paragraph("Resultados del Test")
+            // Añadir título principal
+            doc.add(new Paragraph("Reporte de Resultados de Test")
                     .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
-                    .setFontSize(18));
+                    .setFontSize(20)
+                    .setMarginBottom(15)
+                    .setTextAlignment(com.itextpdf.layout.property.TextAlignment.CENTER));
 
-            // Agregar mensajes de intereses y carreras
-            String mensajeIntereses = (String) resultadoTest.get("mensajeIntereses");
-            String mensajeCarreras = (String) resultadoTest.get("mensajeCarreras");
+            // Añadir subtítulo
+            doc.add(new Paragraph("Tus Resultados:")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
+                    .setFontSize(16)
+                    .setMarginBottom(10)
+                    .setTextAlignment(com.itextpdf.layout.property.TextAlignment.LEFT));
 
+            // Verificar y añadir mensajes de intereses y carreras
+            String mensajeIntereses = (String) resultadoTest.getOrDefault("mensajeIntereses", "No se encontraron datos de intereses.");
+            String mensajeCarreras = (String) resultadoTest.getOrDefault("mensajeCarreras", "No se encontraron datos de carreras.");
+
+            // Añadir sección de intereses
+            doc.add(new Paragraph("Intereses:")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
+                    .setFontSize(14)
+                    .setMarginTop(5));
             doc.add(new Paragraph(mensajeIntereses)
-                    .setFontSize(12)
-                    .setMultipliedLeading(1.5f)); // Ajustar interlineado si es necesario
-
-            doc.add(new Paragraph(mensajeCarreras)
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
                     .setFontSize(12)
                     .setMultipliedLeading(1.5f));
 
-            // Crear tabla con 3 columnas
-            Table table = new Table(3);
-            table.addHeaderCell("Tipo de Resultado");
-            table.addHeaderCell("Categoría");
-            table.addHeaderCell("Suma");
+            // Añadir sección de carreras
+            doc.add(new Paragraph("Carreras Relacionadas:")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD))
+                    .setFontSize(14)
+                    .setMarginTop(10));
+            doc.add(new Paragraph(mensajeCarreras)
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+                    .setFontSize(12)
+                    .setMultipliedLeading(1.5f));
 
-            Map<String, String> nombresCategorias = Map.of(
-                    "C", "Área Administrativa",
-                    "H", "Área de Humanidades",
-                    "A", "Área Artística",
-                    "S", "Área de Ciencias de la Salud",
-                    "I", "Área de Enseñanzas Técnicas",
-                    "D", "Área de Defensa y Seguridad",
-                    "E", "Área de Ciencias Experimentales"
-            );
+            // Añadir un pie de página o nota final
+            doc.add(new Paragraph("Este informe proporciona un resumen de tus intereses y las carreras relacionadas basadas en tus respuestas.")
+                    .setFont(PdfFontFactory.createFont(StandardFonts.HELVETICA))
+                    .setFontSize(10)
+                    .setMarginTop(20)
+                    .setItalic());
 
-            Map<String, Integer> interes = (Map<String, Integer>) resultadoTest.get("Interes");
-            for (String categoria : Arrays.asList("C", "H", "A", "S", "I", "D", "E")) {
-                if (interes.containsKey(categoria)) {
-                    table.addCell("Interés");
-                    table.addCell(nombresCategorias.get(categoria));
-                    table.addCell(String.valueOf(interes.get(categoria)));
-                }
-            }
-
-            Map<String, Integer> aptitud = (Map<String, Integer>) resultadoTest.get("Aptitud");
-            for (String categoria : Arrays.asList("C", "H", "A", "S", "I", "D", "E")) {
-                if (aptitud.containsKey(categoria)) {
-                    table.addCell("Aptitud");
-                    table.addCell(nombresCategorias.get(categoria));
-                    table.addCell(String.valueOf(aptitud.get(categoria)));
-                }
-            }
-
-            // Agregar la tabla al documento
-            doc.add(table);
             doc.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -98,6 +80,4 @@ public class ReportServiceImpl implements ReportService {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
-
-
 }

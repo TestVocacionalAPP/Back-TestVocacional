@@ -8,5 +8,4 @@ import lombok.Data;
 public class TestResponseDTO {
     private Long id;
     private String titulo;
-    private Double puntaje;
 }

@@ -4,6 +4,7 @@ import GTns_TestV.infra.repository.UsuarioRepository;
 import GTns_TestV.model.dto.usuario.UsuarioPerfilDTO;
 import GTns_TestV.model.dto.mapper.UsuarioMapper;
 import GTns_TestV.model.dto.usuario.UsuarioDTO;
+import GTns_TestV.model.dto.usuario.UsuarioUpdateDTO;
 import GTns_TestV.model.entity.Usuario;
 import GTns_TestV.model.enums.Role;
 import GTns_TestV.security.JwtService;
@@ -16,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -54,12 +58,6 @@ public class UsuarioServiceImpl implements UsuarioService {
         return (Usuario) authentication.getPrincipal();  // Asegúrate de que la clase Usuario implemente UserDetails
     }
 
-    // Método para crear un usuario experto, solo accesible por admin
-    public Usuario crearExperto(UsuarioDTO usuarioDTO) {
-        Usuario experto = usuarioMapper.toEntity(usuarioDTO);
-        experto.setRole(Role.EXPERTO);  // Forzamos el rol a EXPERTO
-        return usuarioRepository.save(experto);
-    }
     @Override
     public void eliminarCuenta() {
         // Obtener el usuario autenticado
@@ -70,17 +68,54 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario actualizarPerfil(UsuarioPerfilDTO usuarioPerfilDTO) {
-        // Obtener el usuario autenticado
-        Usuario usuarioActual = getAuthenticatedUser();
+    public Usuario actualizarPerfil(UsuarioUpdateDTO usuarioUpdateDTO) {
+        Usuario usuario = getAuthenticatedUser();
 
-        // Actualizar los datos del perfil
-        usuarioActual.setNombre(usuarioPerfilDTO.getNombre());
-        usuarioActual.setApellido(usuarioPerfilDTO.getApellido());
-        usuarioActual.setTelefono(usuarioPerfilDTO.getTelefono());
-        usuarioActual.setCorreo(usuarioPerfilDTO.getCorreo());
+        // Actualizar los campos del usuario con los datos del DTO
+        usuario.setNombre(usuarioUpdateDTO.getNombre());
+        usuario.setApellido(usuarioUpdateDTO.getApellido());
+        usuario.setTelefono(usuarioUpdateDTO.getTelefono());
+        usuario.setCorreo(usuarioUpdateDTO.getCorreo());
 
-        // Guardar los cambios
-        return usuarioRepository.save(usuarioActual);
+        // Guardar los cambios en la base de datos
+        return usuarioRepository.save(usuario);
+    }
+
+
+    @Override
+    public UsuarioPerfilDTO listarPerfilUsuario() {
+        try {
+            Usuario usuario = getAuthenticatedUser();
+            if (usuario == null) {
+                throw new RuntimeException("Usuario no encontrado");
+            }
+            return new UsuarioPerfilDTO(
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getTelefono(),
+                    usuario.getCorreo(),
+                    usuario.getImagenBase64()
+            );
+        } catch (Exception e) {
+            // Imprime el error en los logs para depuración
+            e.printStackTrace();
+            throw new RuntimeException("Error al obtener el perfil del usuario", e);
+        }
+    }
+
+    @Override
+    public Optional<Usuario> obtenerUsuarioPorId(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId);
+    }
+
+    @Override
+    public Usuario actualizarImagenPerfil(String imagenBase64) {
+        if (!StringUtils.hasText(imagenBase64)) {
+            throw new IllegalArgumentException("La imagen no puede estar vacía.");
+        }
+
+        Usuario usuario = getAuthenticatedUser();
+        usuario.setImagenBase64(imagenBase64);  // Actualiza la imagen en Base64
+        return usuarioRepository.save(usuario);
     }
 }

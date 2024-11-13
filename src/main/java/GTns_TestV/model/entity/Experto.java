@@ -15,7 +15,7 @@ public class Experto extends Usuario {
 
     private String especialidad;
 
-    private double calificacion;
+    private int likes;
 
     private String descripcion;
 

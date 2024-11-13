@@ -8,11 +8,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CarreraRepository extends JpaRepository<Carrera, Long> {
 
     @Query("SELECT c FROM Carrera c WHERE c.categoria = :categoria")
     List<Carrera> findByCategoria(@Param("categoria") ChasideCategory categoria);
+
+    List<Carrera> findByNombreIn(List<String> nombres);
+    List<Carrera> findByNombre(String nombre);
 
 }

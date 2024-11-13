@@ -2,69 +2,104 @@ package GTns_TestV.controller;
 
 import GTns_TestV.model.dto.asesoria.AsesoriaCreateDTO;
 import GTns_TestV.model.dto.asesoria.AsesoriaResponseDTO;
-import GTns_TestV.model.dto.asesoria.AsesoriaUpdateDTO;
+import GTns_TestV.model.entity.Asesoria;
+import GTns_TestV.model.entity.Experto;
 import GTns_TestV.model.entity.Usuario;
-import GTns_TestV.model.enums.Role;
+import GTns_TestV.security.JwtService;
 import GTns_TestV.service.AsesoriaService;
 import GTns_TestV.service.UsuarioService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/asesorias")
-@RequiredArgsConstructor
 public class AsesoriaController {
 
-    private final AsesoriaService asesoriaService;
-    private final UsuarioService usuarioService;  // Para obtener el usuario autenticado
+    @Autowired
+    private AsesoriaService asesoriaService;
+    @Autowired
+    private UsuarioService usuarioService;
 
-    // Endpoint para solicitar una asesoría
     @PostMapping("/solicitar")
-    public ResponseEntity<String> solicitarAsesoria(@RequestBody AsesoriaCreateDTO asesoriaCreateDTO) {
-        // Obtener el usuario autenticado
-        Usuario usuarioActual = usuarioService.getAuthenticatedUser();
-
-        // Pasar el ID del usuario autenticado y el AsesoriaCreateDTO al servicio
-        asesoriaService.solicitarAsesoria(usuarioActual.getId(), asesoriaCreateDTO);
-
-        // Devolver un mensaje de éxito
-        return ResponseEntity.ok("Solicitud de asesoría enviada exitosamente.");
+    public ResponseEntity<AsesoriaResponseDTO> solicitarAsesoria(
+            @RequestBody AsesoriaCreateDTO asesoriaCreateDTO) {
+        Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+        AsesoriaResponseDTO nuevaAsesoria = asesoriaService.solicitarAsesoria(asesoriaCreateDTO, usuarioAutenticado.getId());
+        return ResponseEntity.ok(nuevaAsesoria);
     }
 
-    // Endpoint para listar solicitudes de asesoría para el experto
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<AsesoriaResponseDTO>> obtenerAsesoriasPorUsuario(@PathVariable Long usuarioId) {
+        List<AsesoriaResponseDTO> asesorias = asesoriaService.obtenerAsesoriasPorUsuario(usuarioId);
+        return ResponseEntity.ok(asesorias);
+    }
+
     @GetMapping("/experto/solicitudes")
-    public ResponseEntity<List<AsesoriaResponseDTO>> listarSolicitudesParaExperto() {
-        // Obtener el usuario autenticado
-        Usuario expertoActual = usuarioService.getAuthenticatedUser();
-
-        // Verificar si el usuario tiene el rol de EXPERTO
-        if (!expertoActual.getRole().equals(Role.EXPERTO)) {
-            return ResponseEntity.status(403).build(); // Retornar 403 Forbidden si no es experto
+    public ResponseEntity<List<AsesoriaResponseDTO>> obtenerSolicitudesDeAsesoriaParaExperto() {
+        Usuario expertoAutenticado = usuarioService.getAuthenticatedUser();
+        if (!(expertoAutenticado instanceof Experto)) {
+            throw new RuntimeException("El usuario autenticado no es un experto.");
         }
-
-        // Obtener las solicitudes de asesoría para el experto
-        List<AsesoriaResponseDTO> solicitudes = asesoriaService.listarSolicitudesPorExperto(expertoActual.getId());
-
-        // Retornar la lista de solicitudes
-        return ResponseEntity.ok(solicitudes);
+        List<AsesoriaResponseDTO> asesorias = asesoriaService.obtenerAsesoriasPorExperto(expertoAutenticado.getId());
+        return ResponseEntity.ok(asesorias);
     }
 
-    @PutMapping("/experto/actualizar-estado")
-    public ResponseEntity<AsesoriaResponseDTO> actualizarEstadoAsesoria(@RequestBody AsesoriaUpdateDTO asesoriaUpdateDTO) {
-        // Obtener el usuario autenticado (experto)
-        Usuario expertoActual = usuarioService.getAuthenticatedUser();
+    @PostMapping("/confirmar/{asesoriaId}")
+    public ResponseEntity<AsesoriaResponseDTO> confirmarAsesoria(@PathVariable Long asesoriaId) {
+        // Obtén el usuario autenticado
+        Usuario expertoAutenticado = usuarioService.getAuthenticatedUser();
 
-        // Verificar que el usuario sea un experto
-        if (!expertoActual.getRole().equals(Role.EXPERTO)) {
-            return ResponseEntity.status(403).build();  // Retornar 403 Forbidden si no es experto
+        // Verifica si el usuario es un experto y obtiene su ID
+        if (!(expertoAutenticado instanceof Experto)) {
+            throw new RuntimeException("El usuario autenticado no es un experto.");
         }
 
-        // Actualizar el estado de la asesoría
-        AsesoriaResponseDTO respuesta = asesoriaService.actualizarEstadoAsesoria(expertoActual.getId(), asesoriaUpdateDTO);
+        Long expertoId = expertoAutenticado.getId();  // Asegúrate de que `getId()` devuelva el ID del experto
 
-        return ResponseEntity.ok(respuesta);
+        // Llama al servicio con el `expertoId` obtenido
+        AsesoriaResponseDTO confirmada = asesoriaService.confirmarAsesoria(asesoriaId, expertoId);
+        return ResponseEntity.ok(confirmada);
     }
+
+
+    @PostMapping("/rechazar/{asesoriaId}")
+    public ResponseEntity<AsesoriaResponseDTO> rechazarSolicitud(@PathVariable Long asesoriaId) {
+        Usuario expertoAutenticado = usuarioService.getAuthenticatedUser();
+        if (!(expertoAutenticado instanceof Experto)) {
+            throw new RuntimeException("El usuario autenticado no es un experto.");
+        }
+
+        Long expertoId = expertoAutenticado.getId();
+        AsesoriaResponseDTO rechazada = asesoriaService.rechazarSolicitud(asesoriaId, expertoId);
+        return ResponseEntity.ok(rechazada);
+    }
+
+    @GetMapping("/verificar")
+    public ResponseEntity<List<String>> verificarYNotificarCitas() {
+        Usuario usuarioAutenticado = usuarioService.getAuthenticatedUser();
+        List<String> notificaciones = asesoriaService.verificarYNotificarCitas(usuarioAutenticado.getId());
+        return ResponseEntity.ok(notificaciones);
+    }
+
+    @GetMapping("/expertos/notificaciones")
+    public ResponseEntity<List<AsesoriaResponseDTO>> obtenerNotificaciones() {
+        Usuario expertoAutenticado = usuarioService.getAuthenticatedUser();
+
+        if (!(expertoAutenticado instanceof Experto)) {
+            throw new RuntimeException("El usuario autenticado no es un experto.");
+        }
+
+        List<AsesoriaResponseDTO> notificaciones = asesoriaService.obtenerNotificaciones(expertoAutenticado.getId());
+        return ResponseEntity.ok(notificaciones);
+    }
+
+
+
 }
